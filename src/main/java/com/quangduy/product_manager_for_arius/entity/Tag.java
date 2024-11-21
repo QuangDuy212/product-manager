@@ -15,24 +15,16 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity(name = "products")
+@Entity(name = "tags")
 @JsonPropertyOrder(alphabetic = true)
-public class Product {
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty("_id")
     String id;
     String name;
-    String shortDes;
-    String thumbnail;
-    String[] slider;
-    double price;
-    String color;
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    Category category;
+    String description;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    Set<Tag> tags;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+    Set<Product> products;
 }
