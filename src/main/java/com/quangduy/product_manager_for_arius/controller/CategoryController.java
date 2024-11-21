@@ -44,7 +44,7 @@ public class CategoryController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{categoryId}")
     ApiResponse<CategoryResponse> getDetailCategory(
             @PathVariable("categoryId") String categoryId) {
         return ApiResponse.<CategoryResponse>builder()

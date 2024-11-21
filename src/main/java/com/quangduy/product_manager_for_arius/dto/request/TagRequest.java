@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TagCreationRequest {
+public class TagRequest {
     @Size(min = 3, message = "INVALID_PASSWORD")
     String name;
     String description;
