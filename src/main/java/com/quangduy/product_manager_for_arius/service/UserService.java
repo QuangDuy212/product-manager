@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.quangduy.product_manager_for_arius.constant.PredefinedRole;
 import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.UserUpdateRequest;
+import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
@@ -35,6 +38,7 @@ public class UserService {
     PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request) {
+        log.info("Create a user");
         User user = this.userMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
 
@@ -54,6 +58,7 @@ public class UserService {
     }
 
     public UserResponse getMyInfo() {
+        log.info("Get my info");
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
@@ -64,6 +69,7 @@ public class UserService {
 
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
+        log.info("Update a user");
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
@@ -74,17 +80,34 @@ public class UserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userId) {
+        log.info("Delete a user");
         userRepository.deleteById(userId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> getUsers() {
-        log.info("In method get Users");
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+    public ApiPagination<UserResponse> getUsers(Pageable pageable) {
+        log.info("Get all users");
+        Page<User> pageUser = this.userRepository.findAll(pageable);
+
+        List<UserResponse> listUser = pageUser.getContent().stream().map(userMapper::toUserResponse).toList();
+
+        ApiPagination.Meta mt = new ApiPagination.Meta();
+
+        mt.setCurrent(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(pageUser.getTotalPages());
+        mt.setTotal(pageUser.getTotalElements());
+
+        return ApiPagination.<UserResponse>builder()
+                .meta(mt)
+                .result(listUser)
+                .build();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
+        log.info("Get detail a user");
         return userMapper.toUserResponse(
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
