@@ -1,8 +1,5 @@
 package com.quangduy.product_manager_for_arius.entity;
 
-import java.time.LocalDate;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -18,17 +15,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity(name = "users")
 @JsonPropertyOrder(alphabetic = true)
-public class User {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty("_id")
     String id;
-
-    @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255)")
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    LocalDate dob;
-    String role;
+    String name;
+    String shortDes;
+    String thumbnail;
+    String[] slider;
+    double price;
+    String color;
 }
