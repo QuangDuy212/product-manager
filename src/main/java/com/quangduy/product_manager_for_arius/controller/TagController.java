@@ -40,7 +40,7 @@ public class TagController {
     @GetMapping
     ApiResponse<ApiPagination<TagResponse>> getAllCategories(Pageable pageable) {
         return ApiResponse.<ApiPagination<TagResponse>>builder()
-                .result(this.tagService.getAllCategories(pageable))
+                .result(this.tagService.getAllTags(pageable))
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class TagController {
     ApiResponse<TagResponse> getDetailCategory(
             @PathVariable("tagId") String tagId) {
         return ApiResponse.<TagResponse>builder()
-                .result(this.tagService.getDetailCategory(tagId))
+                .result(this.tagService.getDetailTag(tagId))
                 .build();
     }
 

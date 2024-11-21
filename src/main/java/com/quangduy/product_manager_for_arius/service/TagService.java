@@ -42,18 +42,18 @@ public class TagService {
         return this.tagMapper.toTagResponse(this.tagRepository.save(tagDB));
     }
 
-    public TagResponse getDetailCategory(String categoryId) {
+    public TagResponse getDetailTag(String categoryId) {
         log.info("Get detail tag");
         Tag tagDB = this.tagRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return this.tagMapper.toTagResponse(tagDB);
     }
 
-    public ApiPagination<TagResponse> getAllCategories(Pageable pageable) {
-        log.info("Get all categories");
+    public ApiPagination<TagResponse> getAllTags(Pageable pageable) {
+        log.info("Get all tags");
         Page<Tag> page = this.tagRepository.findAll(pageable);
 
-        List<TagResponse> listTags = page.getContent().stream()
+        List<TagResponse> list = page.getContent().stream()
                 .map(tagMapper::toTagResponse).toList();
 
         ApiPagination.Meta mt = new ApiPagination.Meta();
@@ -66,7 +66,7 @@ public class TagService {
 
         return ApiPagination.<TagResponse>builder()
                 .meta(mt)
-                .result(listTags)
+                .result(list)
                 .build();
     }
 

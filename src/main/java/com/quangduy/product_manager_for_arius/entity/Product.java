@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +26,7 @@ public class Product {
     String name;
     String shortDes;
     String thumbnail;
-    String[] slider;
+    List<String> sliders;
     double price;
     String color;
     @ManyToOne
@@ -34,5 +35,5 @@ public class Product {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    Set<Tag> tags;
+    List<Tag> tags;
 }
