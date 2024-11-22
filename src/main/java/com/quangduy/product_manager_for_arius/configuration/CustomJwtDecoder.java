@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
 import com.quangduy.product_manager_for_arius.dto.request.IntrospectRequest;
+import com.quangduy.product_manager_for_arius.exception.AppException;
+import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.service.AuthenticationService;
 
 @Component
@@ -36,7 +38,7 @@ public class CustomJwtDecoder implements JwtDecoder {
 
             if (!response.isValid())
                 throw new JwtException("Token invalid");
-        } catch (JOSEException | ParseException e) {
+        } catch (Exception e) {
             throw new JwtException(e.getMessage());
         }
 

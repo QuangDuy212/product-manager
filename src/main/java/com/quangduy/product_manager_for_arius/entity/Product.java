@@ -1,7 +1,6 @@
 package com.quangduy.product_manager_for_arius.entity;
 
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

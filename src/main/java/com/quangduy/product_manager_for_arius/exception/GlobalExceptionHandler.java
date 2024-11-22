@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.exception;
 
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -7,10 +8,13 @@ import jakarta.validation.ConstraintViolation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.nimbusds.jose.JOSEException;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +55,17 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(value = { ParseException.class })
+    ResponseEntity<ApiResponse> handlingJwtException(ParseException exception) {
+        ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(exception.getMessage())
                         .build());
     }
 

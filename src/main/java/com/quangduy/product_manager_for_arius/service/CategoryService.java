@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
-import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
