@@ -1,7 +1,5 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -18,14 +16,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonPropertyOrder(alphabetic = true)
-public class OrderResponse {
+public class OrderDetailResponse {
     @JsonProperty("_id")
     String id;
-    double totalPrice;
-    String reciverName;
-    String reciverAddress;
-    String reciverPhone;
-    String status;
-    UserResponse user;
-    List<OrderDetailResponse> orderDetails;
+    long quantity;
+    double price;
+    ProductResponse product;
 }

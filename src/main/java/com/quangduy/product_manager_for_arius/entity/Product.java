@@ -2,6 +2,8 @@ package com.quangduy.product_manager_for_arius.entity;
 
 import java.util.List;
 
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -35,4 +37,7 @@ public class Product {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_tag", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     List<Tag> tags;
+
+    @OneToMany(mappedBy = "product")
+    List<OrderDetail> orderDetails;
 }

@@ -39,14 +39,14 @@ public class ProductController {
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<ProductResponse>> getAllCategories(Pageable pageable) {
+    ApiResponse<ApiPagination<ProductResponse>> getAllProducts(Pageable pageable) {
         return ApiResponse.<ApiPagination<ProductResponse>>builder()
                 .result(this.productService.getAllProducts(pageable))
                 .build();
     }
 
     @GetMapping("/{productId}")
-    ApiResponse<ProductResponse> getDetailCategory(
+    ApiResponse<ProductResponse> getDetailProduct(
             @PathVariable("productId") String productId) {
         return ApiResponse.<ProductResponse>builder()
                 .result(this.productService.getDetailProduct(productId))

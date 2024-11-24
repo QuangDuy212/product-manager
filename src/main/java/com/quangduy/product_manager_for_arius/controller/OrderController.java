@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.quangduy.product_manager_for_arius.dto.request.OrderCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
@@ -32,7 +33,7 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping
-    ApiResponse<OrderResponse> create(@RequestBody @Valid OrderRequest request) {
+    ApiResponse<OrderResponse> create(@RequestBody @Valid OrderCreationRequest request) {
         return ApiResponse.<OrderResponse>builder()
                 .result(this.orderService.create(request))
                 .build();
@@ -42,6 +43,13 @@ public class OrderController {
     ApiResponse<ApiPagination<OrderResponse>> getAllEntities(Pageable pageable) {
         return ApiResponse.<ApiPagination<OrderResponse>>builder()
                 .result(this.orderService.getAllOrders(pageable))
+                .build();
+    }
+
+    @GetMapping("/history")
+    ApiResponse<ApiPagination<OrderResponse>> getHistory(Pageable pageable) {
+        return ApiResponse.<ApiPagination<OrderResponse>>builder()
+                .result(this.orderService.getHistory(pageable))
                 .build();
     }
 

@@ -2,6 +2,8 @@ package com.quangduy.product_manager_for_arius.dto.request;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
@@ -16,7 +18,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderRequest {
+public class OrderCreationRequest {
     @Min(value = 1, message = "INVALID_PRICE_ORDER")
     double totalPrice;
     String reciverName;
@@ -25,4 +27,16 @@ public class OrderRequest {
     String reciverPhone;
     String status;
     String userId;
+    List<DetailRequest> detail;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class DetailRequest {
+        @JsonProperty("_id")
+        String id;
+        long quantity;
+    }
 }

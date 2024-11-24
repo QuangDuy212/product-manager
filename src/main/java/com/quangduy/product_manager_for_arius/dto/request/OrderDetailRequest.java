@@ -12,6 +12,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderUpdateRequest {
-    String status;
+public class OrderDetailRequest {
+    long quantity;
+    double price;
+    String productId;
+    String orderId;
 }

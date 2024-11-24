@@ -1,12 +1,9 @@
 package com.quangduy.product_manager_for_arius.entity;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,24 +13,20 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity(name = "orders")
+@Entity(name = "order_details")
 @JsonPropertyOrder(alphabetic = true)
-public class Order {
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty("_id")
     String id;
-    double totalPrice;
-    String reciverName;
-    String reciverAddress;
-    @Pattern(regexp = "(^$|[0-9]{10})")
-    String reciverPhone;
-    String status;
+    long quantity;
+    double price;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
-
-    @OneToMany(mappedBy = "order")
-    List<OrderDetail> orderDetails;
+    @JoinColumn(name = "order_id")
+    Order order;
 }
