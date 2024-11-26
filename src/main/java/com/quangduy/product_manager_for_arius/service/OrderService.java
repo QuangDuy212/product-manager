@@ -13,6 +13,7 @@ import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.OrderDetailResponse;
 import com.quangduy.product_manager_for_arius.dto.response.OrderResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.Order;
 import com.quangduy.product_manager_for_arius.entity.OrderDetail;
 import com.quangduy.product_manager_for_arius.entity.Product;
@@ -109,6 +110,13 @@ public class OrderService {
                                 .meta(mt)
                                 .result(list)
                                 .build();
+        }
+
+        public List<OrderResponse> getAllOrders() {
+                log.info("Get all orders");
+                List<Order> entities = this.orderRepository.findAll();
+                List<OrderResponse> res = entities.stream().map(orderMapper::toOrderResponse).toList();
+                return res;
         }
 
         public ApiPagination<OrderResponse> getHistory(Pageable pageable) {
