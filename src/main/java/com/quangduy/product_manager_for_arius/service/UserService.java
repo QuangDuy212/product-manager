@@ -1,5 +1,7 @@
 package com.quangduy.product_manager_for_arius.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.quangduy.product_manager_for_arius.constant.PredefinedRole;
 import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
@@ -22,6 +25,7 @@ import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.UserMapper;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
+import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +40,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    UserExcelImport userExcelImport;
 
     public UserResponse createUser(UserCreationRequest request) {
         log.info("Create a user");
@@ -119,4 +124,15 @@ public class UserService {
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
+    public List<UserResponse> saveFromFileExcel(MultipartFile file) {
+        List<User> entites = new ArrayList<User>();
+        try {
+            List<User> data = userExcelImport.excelToStuList(file.getInputStream());
+            entites = userRepository.saveAll(data);
+        } catch (IOException ex) {
+            throw new RuntimeException("Excel data is failed to store: " + ex.getMessage());
+        }
+        List<UserResponse> res = entites.stream().map(userMapper::toUserResponse).toList();
+        return res;
+    }
 }
