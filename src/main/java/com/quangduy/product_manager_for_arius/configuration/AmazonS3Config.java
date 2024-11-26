@@ -20,15 +20,10 @@ public class AmazonS3Config {
     @Value("${aws.s3.region}")
     private String region;
 
-    private AmazonS3 amazonS3;
-
     @Bean
     public AmazonS3 amazonS3() {
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey,
                 secretKey);
-        System.err.println(">>>> check accessKey: " + accessKey);
-        System.err.println(">>>> check secretKey: " + secretKey);
-        System.err.println(">>>> check region: " + region);
         return AmazonS3Client.builder()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))

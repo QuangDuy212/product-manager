@@ -105,6 +105,13 @@ public class UserService {
                 .build();
     }
 
+    public List<UserResponse> getUsers() {
+        log.info("Get all users");
+        List<User> entities = this.userRepository.findAll();
+        List<UserResponse> res = entities.stream().map(userMapper::toUserResponse).toList();
+        return res;
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
         log.info("Get detail a user");
