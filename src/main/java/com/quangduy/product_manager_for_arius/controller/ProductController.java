@@ -1,5 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,14 +10,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.service.ProductService;
+import com.quangduy.product_manager_for_arius.service.importfile.ProductExcelImport;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -30,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductController {
     ProductService productService;
+    ProductExcelImport productExcelImport;
 
     @PostMapping
     ApiResponse<ProductResponse> create(@RequestBody @Valid ProductCreationRequest request) {
@@ -67,5 +74,10 @@ public class ProductController {
         return ApiResponse.<String>builder()
                 .result("Delete success")
                 .build();
+    }
+
+    @PostMapping("/excel/import")
+    public ApiResponse<?> importData(@RequestParam("file") MultipartFile file) {
+        return this.productService.importData(file);
     }
 }

@@ -1,18 +1,24 @@
 package com.quangduy.product_manager_for_arius.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
+import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
 import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.Tag;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.CategoryMapper;
@@ -21,6 +27,7 @@ import com.quangduy.product_manager_for_arius.mapper.TagMapper;
 import com.quangduy.product_manager_for_arius.repository.CategoryRepository;
 import com.quangduy.product_manager_for_arius.repository.ProductRepository;
 import com.quangduy.product_manager_for_arius.repository.TagRepository;
+import com.quangduy.product_manager_for_arius.service.importfile.ProductExcelImport;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +45,7 @@ public class ProductService {
     ProductMapper productMapper;
     TagMapper tagMapper;
     CategoryMapper categoryMapper;
+    ProductExcelImport productExcelImport;
 
     public ProductResponse create(ProductCreationRequest request) {
         log.info("Create a product");
@@ -114,5 +122,40 @@ public class ProductService {
     public void delete(String productId) {
         log.info("Delete a product");
         this.productRepository.deleteById(productId);
+    }
+
+    public List<ProductResponse> saveFromFileExcel(MultipartFile file) {
+        List<Product> entites = new ArrayList<Product>();
+        try {
+            List<Product> data = productExcelImport.excelToStuList(file.getInputStream());
+            entites = productRepository.saveAll(data);
+        } catch (IOException ex) {
+            throw new RuntimeException("Excel data is failed to store: " + ex.getMessage());
+        }
+        List<ProductResponse> res = entites.stream().map(productMapper::toProductResponse).toList();
+        return res;
+    }
+
+    public ApiResponse<?> importData(MultipartFile file) {
+        String message = "";
+        if (productExcelImport.hasExcelFormat(file)) {
+            try {
+                List<ProductResponse> res = this.saveFromFileExcel(file);
+                message = "The Excel file is uploaded: " + file.getOriginalFilename();
+                return ApiResponse.<List<ProductResponse>>builder()
+                        .result(res)
+                        .build();
+            } catch (Exception exp) {
+                message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
+                // return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+                return ApiResponse.<String>builder()
+                        .result(message)
+                        .build();
+            }
+        }
+        message = "Please upload an excel file!";
+        return ApiResponse.<String>builder()
+                .result(message)
+                .build();
     }
 }

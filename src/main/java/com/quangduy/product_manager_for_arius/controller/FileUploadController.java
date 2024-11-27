@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.service.S3FileUploadService;
 
 import lombok.AccessLevel;
@@ -22,8 +23,11 @@ public class FileUploadController {
     S3FileUploadService fileUploadService;
 
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        fileUploadService.uploadFile(file, "product");
-        return "File uploaded successfully!";
+    public ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file,
+            @RequestParam("folder") String folder)
+            throws IOException {
+        return ApiResponse.<String>builder()
+                .result(fileUploadService.uploadFile(file, "quangduy/" + folder))
+                .build();
     }
 }

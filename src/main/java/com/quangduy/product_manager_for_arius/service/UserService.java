@@ -2,7 +2,6 @@ package com.quangduy.product_manager_for_arius.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
