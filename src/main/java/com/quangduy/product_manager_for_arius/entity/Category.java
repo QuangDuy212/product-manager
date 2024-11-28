@@ -19,9 +19,6 @@ import lombok.experimental.FieldDefaults;
 @JsonPropertyOrder(alphabetic = true)
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @JsonProperty("_id")
-    String id;
     @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255)")
     String name;
 

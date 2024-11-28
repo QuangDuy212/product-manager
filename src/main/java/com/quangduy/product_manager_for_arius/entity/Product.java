@@ -31,7 +31,7 @@ public class Product {
     double price;
     String color;
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = true)
+    @JoinColumn(name = "category_name", nullable = true)
     Category category;
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -17,7 +17,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonPropertyOrder(alphabetic = true)
 public class CategoryResponse {
-    @JsonProperty("_id")
-    String id;
     String name;
 }
