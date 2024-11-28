@@ -8,6 +8,13 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Constants.ConstantException;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,18 +30,23 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.quangduy.product_manager_for_arius.constant.PredefinedRole;
 import com.quangduy.product_manager_for_arius.dto.request.AuthenticationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.IntrospectRequest;
 import com.quangduy.product_manager_for_arius.dto.request.LogoutRequest;
 import com.quangduy.product_manager_for_arius.dto.request.RefreshRequest;
 import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
 import com.quangduy.product_manager_for_arius.dto.response.IntrospectResponse;
+import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.InvalidatedToken;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
+import com.quangduy.product_manager_for_arius.mapper.AuthMapper;
+import com.quangduy.product_manager_for_arius.mapper.UserMapper;
 import com.quangduy.product_manager_for_arius.repository.InvalidatedTokenRepository;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
+import com.quangduy.product_manager_for_arius.util.SecurityUtil;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,133 +59,202 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AuthenticationService {
+    AuthenticationManagerBuilder authenticationManagerBuilder;
+    SecurityUtil securityUtil;
+    UserService userService;
+    PasswordEncoder passwordEncoder;
+    AuthMapper authMapper;
+    UserMapper userMapper;
     UserRepository userRepository;
-    InvalidatedTokenRepository invalidatedTokenRepository;
 
+    @Value("${quangduy.jwt.refresh-token-validity-in-seconds}")
     @NonFinal
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+    long refreshTokenExpiration;
 
+    @Value("${quangduy.jwt.base64-secret}")
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
+    String SIGNER_KEY;
 
-    @NonFinal
-    @Value("${jwt.refreshable-duration}")
-    protected long REFRESHABLE_DURATION;
-
-    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
+    public ResponseEntity<IntrospectResponse> introspect(IntrospectRequest request) {
         var token = request.getToken();
         boolean isValid = true;
 
         try {
             verifyToken(token, false);
-        } catch (AppException e) {
+        } catch (JOSEException | ParseException | ConstantException e) {
             isValid = false;
         }
 
-        return IntrospectResponse.builder().valid(isValid).build();
+        return ResponseEntity.ok().body(IntrospectResponse.builder().valid(isValid).build());
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        var user = userRepository
-                .findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ResponseEntity<UserResponse> login(AuthenticationRequest request) {
+        // Nạp input gồm username/password vào Security
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                request.getUsername(), request.getPassword());
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        // xác thực người dùng => cần viết hàm loadUserByUsername
+        Authentication authentication = authenticationManagerBuilder.getObject()
+                .authenticate(authenticationToken);
 
-        if (!authenticated)
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        // save info auth into security context
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        var token = generateToken(user);
-
-        return AuthenticationResponse.builder().token(token).authenticated(true).build();
-    }
-
-    public void logout(LogoutRequest request) throws ParseException, JOSEException {
-        try {
-            var signToken = verifyToken(request.getToken(), true);
-
-            String jit = signToken.getJWTClaimsSet().getJWTID();
-            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
-
-            InvalidatedToken invalidatedToken = InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
-
-            invalidatedTokenRepository.save(invalidatedToken);
-        } catch (AppException exception) {
-            log.info("Token already expired");
+        // return api
+        AuthenticationResponse res = new AuthenticationResponse();
+        User currentUserDB = this.userService.handleGetUserByUsername(request.getUsername());
+        if (currentUserDB != null) {
+            res.setUser(this.authMapper.toUserLogin(currentUserDB));
         }
-    }
+        // create a token
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
+        res.setAccessToken(access_token);
 
-    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
-        var signedJWT = verifyToken(request.getToken(), true);
+        // create refesh token
+        String refresh_token = this.securityUtil.createRefreshToken(request.getUsername(), res);
+        res.setRefreshToken(refresh_token);
+        this.userService.updateUserToken(refresh_token, request.getUsername());
 
-        var jit = signedJWT.getJWTClaimsSet().getJWTID();
-        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-        InvalidatedToken invalidatedToken = InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
-
-        invalidatedTokenRepository.save(invalidatedToken);
-
-        var username = signedJWT.getJWTClaimsSet().getSubject();
-
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
-
-        var token = generateToken(user);
-
-        return AuthenticationResponse.builder().token(token).authenticated(true).build();
-    }
-
-    private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("devteria.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString())
-                .claim("scope", "ROLE_" + user.getRole())
+        // set cookies
+        ResponseCookie resCookies = ResponseCookie
+                .from("refresh_token", refresh_token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
                 .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            log.error("Cannot create token", e);
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
+                .body(res);
     }
 
-    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-        // SignedJWT signedJWT = null;
-        // try {
-        // signedJWT = SignedJWT.parse(token);
+    public ResponseEntity<RegisterResponse> register(RegisterRequest request) throws MyAppException {
 
-        // } catch (ParseException e) {
-        // throw new AppException(ErrorCode.UNAUTHENTICATED);
-        // }
+        String hashPass = passwordEncoder.encode(request.getPassword());
+        request.setPassword(hashPass);
+        boolean isExistsEmail = this.userService.isEmailExist(request.getEmail());
+        if (isExistsEmail) {
+            throw new MyAppException("Email đã tồn tại, vui lòng nhập lại!");
+        }
+
+        boolean isExistUsername = this.userService.isUsernameExist(request.getUsername());
+        if (isExistUsername) {
+            throw new MyAppException("Username đã tồn tại, vui lòng nhập lại!");
+        }
+        User user = this.authMapper.toUser(request);
+        user.setPassword(this.passwordEncoder.encode(request.getPassword()));
+        user.setType("SYSTEM");
+        user.setVerify(false);
+        if (request.getRole() == null) {
+            user.setRole(PredefinedRole.USER_ROLE.toString());
+        }
+        user = this.userRepository.save(user);
+        RegisterResponse response = this.authMapper.toRegisterResponse(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    public ResponseEntity<UserResponse> getAccount() {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        User currentUserDB = this.userService.handleGetUserByUsername(email);
+        UserResponse res = this.userMapper.toUserResponse(currentUserDB);
+        return ResponseEntity.ok().body(res);
+    }
+
+    public ResponseEntity<Void> logout() throws MyAppException {
+        String username = SecurityUtil.getCurrentUserLogin().isPresent()
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        if (username.equals("")) {
+            throw new MyAppException("Access Token không hợp lệ");
+        }
+        User currentUserDB = this.userService.handleGetUserByUsername(username);
+        if (currentUserDB != null) {
+            // set refresh token == null
+            this.userService.handleLogout(currentUserDB);
+        }
+        // remove refresh_token in cookies
+        ResponseCookie deleteSpringCookie = ResponseCookie
+                .from("refresh_token", null)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
+                .body(null);
+    }
+
+    public ResponseEntity<LoginResponse> refreshToken(String refresh_token) throws MyAppException {
+        // check valid token
+        if (refresh_token.equals("duy")) {
+            throw new MyAppException("Bạn không có refresh_token ở cookies");
+        }
+        Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refresh_token);
+        String username = decodedToken.getSubject();
+
+        // check user by token + email ( 2nd layer check)
+        User currentUser = this.userService.getUserByRefreshTokenAndUsername(refresh_token, username);
+        if (currentUser == null) {
+            throw new MyAppException("Refresh token không hợp lệ");
+        }
+
+        // issue new token/set refresh token as cookies
+        LoginResponse res = new LoginResponse();
+        User currentUserDB = this.userService.handleGetUserByUsername(username);
+        if (currentUserDB != null) {
+            res = LoginResponse.builder()
+                    .user(this.authMapper.toUserLogin(currentUserDB))
+                    .build();
+        }
+
+        // create a token
+        String access_token = this.securityUtil.createAccessToken(username, res);
+        res.setAccessToken(access_token);
+
+        // create refesh token
+        String new_refresh_token = this.securityUtil.createRefreshToken(username, res);
+        res.setRefreshToken(new_refresh_token);
+        this.userService.updateUserToken(new_refresh_token, username);
+
+        // set cookies
+        ResponseCookie resCookies = ResponseCookie
+                .from("refresh_token", new_refresh_token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
+                .body(res);
+    }
+
+    private SignedJWT verifyToken(String token, boolean isRefresh)
+            throws JOSEException, ParseException, ConstantException {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
         SignedJWT signedJWT = SignedJWT.parse(token);
-        var verified = signedJWT.verify(verifier);
 
         Date expiryTime = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
-                        .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                        .toInstant().plus(refreshTokenExpiration, ChronoUnit.SECONDS)
+                        .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        if (!(verified && expiryTime.after(new Date())))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        var verified = signedJWT.verify(verifier);
 
-        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!(verified && expiryTime.after(new Date())))
+            throw new ConstantException(ErrorCode.UNAUTHENTICATED);
+
+        String username = SecurityUtil.getCurrentUserLogin().isPresent()
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        if (username.equals("")) {
+            throw new ConstantException(ErrorCode.UNAUTHENTICATED);
+        }
 
         return signedJWT;
     }

@@ -1,17 +1,12 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,17 +15,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.wellarchitected.model.Answer;
 import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.UserUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
-import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.UserService;
 import com.quangduy.product_manager_for_arius.service.export.UserExcelExporter;
 import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;

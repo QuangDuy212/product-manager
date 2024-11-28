@@ -23,10 +23,11 @@ spring:
   sql:
     init:
       platform: postgres
-jwt:
-  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 36000 # in second
-  refreshable-duration: 36000 # in second
+quangduy:
+  jwt:
+    base64-secret: qoAEABDke07+AVLepXB4aCMtsT0wMAqR5x2VFyldsnx6e75YQkJH2UcZKTjEyoNgG71SBCXfq5N6NVZxWOfsHQ==
+    access-token-validity-in-seconds: 8640000
+    refresh-token-validity-in-seconds: 8640000
 aws:
   accessKey: ${ARIUS_ACCESSKEY}
   secretKey: ${ARIUS_SECRETKEY}

@@ -134,4 +134,9 @@ public class UserService {
         List<UserResponse> res = entites.stream().map(userMapper::toUserResponse).toList();
         return res;
     }
+
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
 }

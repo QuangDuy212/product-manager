@@ -1,5 +1,7 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationResponse {
-    String token;
-    boolean authenticated;
+    @JsonProperty("access_token")
+    String accessToken;
+    @JsonProperty("refresh_token")
+    String refreshToken;
+    UserResponse user;
 }
