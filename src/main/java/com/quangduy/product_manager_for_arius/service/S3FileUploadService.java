@@ -22,6 +22,11 @@ public class S3FileUploadService {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
+    private void uploadFileTos3bucket(String fileName, File file) {
+        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+    }
+
     public String uploadFile(MultipartFile file, String folder) {
         File localFile = null;
         String fileName = folder + "/" + file.getOriginalFilename();
@@ -35,6 +40,18 @@ public class S3FileUploadService {
             localFile.delete();
         }
         String fileUrl = this.amazonS3.getUrl(bucketName, fileName).toString();
+        return fileUrl;
+    }
+
+    public String uploadFile(File file, String folder, String fileName) {
+        String fileUrl = "";
+        try {
+            uploadFileTos3bucket(fileName, file);
+            file.delete();
+            fileUrl = this.amazonS3.getUrl(bucketName, fileName).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return fileUrl;
     }
 

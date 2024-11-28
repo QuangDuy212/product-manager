@@ -1,6 +1,5 @@
 package com.quangduy.product_manager_for_arius.configuration;
 
-import java.text.ParseException;
 import java.util.Objects;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -13,10 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
-import com.nimbusds.jose.JOSEException;
 import com.quangduy.product_manager_for_arius.dto.request.IntrospectRequest;
-import com.quangduy.product_manager_for_arius.exception.AppException;
-import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.service.AuthenticationService;
 
 @Component

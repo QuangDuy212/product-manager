@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductController {
     ProductService productService;
-    ProductExcelImport productExcelImport;
 
     @PostMapping
     ApiResponse<ProductResponse> create(@RequestBody @Valid ProductCreationRequest request) {

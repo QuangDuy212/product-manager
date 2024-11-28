@@ -8,4 +8,6 @@ import com.quangduy.product_manager_for_arius.entity.Category;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, String> {
     Category findByName(String name);
+
+    boolean existsByName(String name);
 }

@@ -22,6 +22,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty("_id")
     String id;
+    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255)")
     String name;
 
     @OneToMany(mappedBy = "category")
