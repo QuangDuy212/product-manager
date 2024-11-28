@@ -17,6 +17,7 @@ public enum ErrorCode {
     UNAUTHORIZED(403, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(400, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     CATEGORY_NOT_FOUND(400, "This category not found", HttpStatus.BAD_REQUEST),
+    CATEGORY_EXISTED(400, "This category is existed", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(400, "This product not found", HttpStatus.BAD_REQUEST),
     ORDER_NOT_FOUND(400, "This order not found", HttpStatus.BAD_REQUEST),
     ;

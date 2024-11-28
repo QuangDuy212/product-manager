@@ -30,12 +30,16 @@ public class CategoryService {
 
     public CategoryResponse create(CategoryRequest request) {
         log.info("Create a category");
+        if (this.categoryRepository.existsByName(request.getName()))
+            throw new AppException(ErrorCode.CATEGORY_EXISTED);
         Category category = this.categoryMapper.toCategory(request);
         return this.categoryMapper.toCategoryResponse(this.categoryRepository.save(category));
     }
 
     public CategoryResponse update(String categoryId, CategoryRequest request) {
         log.info("Update a category");
+        if (this.categoryRepository.existsByName(request.getName()))
+            throw new AppException(ErrorCode.CATEGORY_EXISTED);
         Category categoryDB = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         this.categoryMapper.updateCategory(categoryDB, request);
