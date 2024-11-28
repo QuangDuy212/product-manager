@@ -26,12 +26,15 @@ public class User {
     @JsonProperty("_id")
     String id;
 
+    @Column(columnDefinition = "TEXT")
+    String refreshToken;
+
     @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255)")
     String username;
     String password;
     String firstName;
     String lastName;
-    LocalDate dob;
+    String address;
     String role;
 
     @OneToMany(mappedBy = "user")

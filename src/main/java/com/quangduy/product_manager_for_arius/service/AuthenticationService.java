@@ -1,12 +1,8 @@
 package com.quangduy.product_manager_for_arius.service;
 
 import java.text.ParseException;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Constants.ConstantException;
 import org.springframework.http.ResponseCookie;
@@ -15,36 +11,29 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.quangduy.product_manager_for_arius.constant.PredefinedRole;
 import com.quangduy.product_manager_for_arius.dto.request.AuthenticationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.IntrospectRequest;
-import com.quangduy.product_manager_for_arius.dto.request.LogoutRequest;
-import com.quangduy.product_manager_for_arius.dto.request.RefreshRequest;
+import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
+import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
 import com.quangduy.product_manager_for_arius.dto.response.IntrospectResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
-import com.quangduy.product_manager_for_arius.entity.InvalidatedToken;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.AuthMapper;
 import com.quangduy.product_manager_for_arius.mapper.UserMapper;
-import com.quangduy.product_manager_for_arius.repository.InvalidatedTokenRepository;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
 import com.quangduy.product_manager_for_arius.util.SecurityUtil;
 
@@ -81,14 +70,14 @@ public class AuthenticationService {
 
         try {
             verifyToken(token, false);
-        } catch (JOSEException | ParseException | ConstantException e) {
+        } catch (JOSEException | ParseException e) {
             isValid = false;
         }
 
         return ResponseEntity.ok().body(IntrospectResponse.builder().valid(isValid).build());
     }
 
-    public ResponseEntity<UserResponse> login(AuthenticationRequest request) {
+    public AuthenticationResponse login(AuthenticationRequest request) {
         // Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername(), request.getPassword());
@@ -104,10 +93,11 @@ public class AuthenticationService {
         AuthenticationResponse res = new AuthenticationResponse();
         User currentUserDB = this.userService.handleGetUserByUsername(request.getUsername());
         if (currentUserDB != null) {
-            res.setUser(this.authMapper.toUserLogin(currentUserDB));
+            res.setUser(this.authMapper.toUserResponse(currentUserDB));
         }
         // create a token
-        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
+        String name = authentication.getName();
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
         res.setAccessToken(access_token);
 
         // create refesh token
@@ -123,33 +113,27 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
-        return ResponseEntity.ok()
+        ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(res);
+        return res;
     }
 
-    public ResponseEntity<RegisterResponse> register(RegisterRequest request) throws MyAppException {
+    public ResponseEntity<UserResponse> register(UserCreationRequest request) throws AppException {
 
         String hashPass = passwordEncoder.encode(request.getPassword());
         request.setPassword(hashPass);
-        boolean isExistsEmail = this.userService.isEmailExist(request.getEmail());
-        if (isExistsEmail) {
-            throw new MyAppException("Email đã tồn tại, vui lòng nhập lại!");
-        }
-
-        boolean isExistUsername = this.userService.isUsernameExist(request.getUsername());
-        if (isExistUsername) {
-            throw new MyAppException("Username đã tồn tại, vui lòng nhập lại!");
+        boolean isExist = this.userService.isExistByUsername(request.getUsername());
+        if (isExist) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
         User user = this.authMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
-        user.setType("SYSTEM");
-        user.setVerify(false);
         if (request.getRole() == null) {
             user.setRole(PredefinedRole.USER_ROLE.toString());
         }
         user = this.userRepository.save(user);
-        RegisterResponse response = this.authMapper.toRegisterResponse(user);
+        UserResponse response = this.authMapper.toUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -162,12 +146,12 @@ public class AuthenticationService {
         return ResponseEntity.ok().body(res);
     }
 
-    public ResponseEntity<Void> logout() throws MyAppException {
+    public ResponseEntity<Void> logout() throws AppException {
         String username = SecurityUtil.getCurrentUserLogin().isPresent()
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
         if (username.equals("")) {
-            throw new MyAppException("Access Token không hợp lệ");
+            throw new AppException(ErrorCode.INVALID_ACCESSTOKEN);
         }
         User currentUserDB = this.userService.handleGetUserByUsername(username);
         if (currentUserDB != null) {
@@ -187,10 +171,10 @@ public class AuthenticationService {
                 .body(null);
     }
 
-    public ResponseEntity<LoginResponse> refreshToken(String refresh_token) throws MyAppException {
+    public ResponseEntity<AuthenticationResponse> refreshToken(String refresh_token) throws AppException {
         // check valid token
         if (refresh_token.equals("duy")) {
-            throw new MyAppException("Bạn không có refresh_token ở cookies");
+            throw new AppException(ErrorCode.COOKIES_EMPTY);
         }
         Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refresh_token);
         String username = decodedToken.getSubject();
@@ -198,20 +182,20 @@ public class AuthenticationService {
         // check user by token + email ( 2nd layer check)
         User currentUser = this.userService.getUserByRefreshTokenAndUsername(refresh_token, username);
         if (currentUser == null) {
-            throw new MyAppException("Refresh token không hợp lệ");
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         // issue new token/set refresh token as cookies
-        LoginResponse res = new LoginResponse();
+        AuthenticationResponse res = new AuthenticationResponse();
         User currentUserDB = this.userService.handleGetUserByUsername(username);
         if (currentUserDB != null) {
-            res = LoginResponse.builder()
-                    .user(this.authMapper.toUserLogin(currentUserDB))
+            res = AuthenticationResponse.builder()
+                    .user(this.authMapper.toUserResponse(currentUserDB))
                     .build();
         }
 
         // create a token
-        String access_token = this.securityUtil.createAccessToken(username, res);
+        String access_token = this.securityUtil.createAccessToken(username, res.getUser());
         res.setAccessToken(access_token);
 
         // create refesh token
@@ -233,7 +217,7 @@ public class AuthenticationService {
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh)
-            throws JOSEException, ParseException, ConstantException {
+            throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -247,13 +231,13 @@ public class AuthenticationService {
         var verified = signedJWT.verify(verifier);
 
         if (!(verified && expiryTime.after(new Date())))
-            throw new ConstantException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         String username = SecurityUtil.getCurrentUserLogin().isPresent()
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
         if (username.equals("")) {
-            throw new ConstantException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;

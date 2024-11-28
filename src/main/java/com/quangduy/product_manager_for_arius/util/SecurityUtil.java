@@ -34,6 +34,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 @Service
+@RequiredArgsConstructor
 public class SecurityUtil {
     @NonFinal
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
@@ -52,7 +53,7 @@ public class SecurityUtil {
 
     final JwtEncoder jwtEncoder;
 
-    public String createAccessToken(String email, UserResponse dto) {
+    public String createAccessToken(String username, UserResponse dto) {
         // user info inside token
 
         // time
@@ -67,7 +68,7 @@ public class SecurityUtil {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(email)
+                .subject(username)
                 .claim("user", dto)
                 .claim("permission", listAuthority)
                 .build();

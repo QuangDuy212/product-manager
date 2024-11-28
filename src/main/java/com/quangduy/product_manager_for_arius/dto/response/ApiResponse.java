@@ -13,9 +13,10 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     @Builder.Default
-    private int code = 200;
+    private int statusCode = 200;
 
     @Builder.Default
-    private String message = "CALL API SUCCESS";
+    private Object message = "CALL API SUCCESS";
+    private String error;
     private T result;
 }

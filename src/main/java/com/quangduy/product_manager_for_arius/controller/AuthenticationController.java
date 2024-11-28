@@ -30,30 +30,16 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        log.info(">>>>>>>>>>>>>> dit me may");
-        var result = authenticationService.authenticate(request);
+    @PostMapping("/login")
+    ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+        var result = authenticationService.login(request);
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 
-    @PostMapping("/introspect")
-    ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
-            throws ParseException, JOSEException {
-        var result = authenticationService.introspect(request);
-        return ApiResponse.<IntrospectResponse>builder().result(result).build();
-    }
-
-    @PostMapping("/refresh")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
-            throws ParseException, JOSEException {
-        var result = authenticationService.refreshToken(request);
-        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
-    }
-
-    @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
-        authenticationService.logout(request);
-        return ApiResponse.<Void>builder().build();
-    }
+    // @PostMapping("/logout")
+    // ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws
+    // ParseException, JOSEException {
+    // authenticationService.logout(request);
+    // return ApiResponse.<Void>builder().build();
+    // }
 }

@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception exception) {
         ApiResponse<?> apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setStatusCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
 
         return ResponseEntity.badRequest().body(apiResponse);
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<?>> handlingException(HttpRequestMethodNotSupportedException exception) {
         ApiResponse<?> apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setStatusCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
 
         return ResponseEntity.badRequest().body(apiResponse);
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
         ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setStatusCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
+                        .statusCode(errorCode.getCode())
                         .message(errorCode.getMessage())
                         .build());
     }
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
+                        .statusCode(errorCode.getCode())
                         .message(exception.getMessage())
                         .build());
     }
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setStatusCode(errorCode.getCode());
         apiResponse.setMessage(
                 Objects.nonNull(attributes)
                         ? mapAttribute(errorCode.getMessage(), attributes)

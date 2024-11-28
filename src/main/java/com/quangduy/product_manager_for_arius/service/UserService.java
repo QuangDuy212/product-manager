@@ -139,4 +139,25 @@ public class UserService {
         return this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
+
+    public void updateUserToken(String token, String username) {
+        User currentUser = this.handleGetUserByUsername(username);
+        if (currentUser != null) {
+            currentUser.setRefreshToken(token);
+            this.userRepository.save(currentUser);
+        }
+    }
+
+    public boolean isExistByUsername(String username) {
+        return this.userRepository.existsByUsername(username);
+    }
+
+    public void handleLogout(User user) {
+        user.setRefreshToken(null);
+        this.userRepository.save(user);
+    }
+
+    public User getUserByRefreshTokenAndUsername(String token, String username) {
+        return this.userRepository.findByRefreshTokenAndUsername(token, username);
+    }
 }

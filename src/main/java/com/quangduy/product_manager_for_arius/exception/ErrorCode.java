@@ -9,6 +9,9 @@ import lombok.Getter;
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(500, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(400, "Uncategorized error", HttpStatus.BAD_REQUEST),
+    COOKIES_EMPTY(400, "You don't have refresh_token in cookies", HttpStatus.BAD_REQUEST),
+    INVALID_REFRESH_TOKEN(400, "Invalid refresh_token", HttpStatus.BAD_REQUEST),
+    INVALID_ACCESSTOKEN(400, "Invalid access token", HttpStatus.BAD_REQUEST),
     USER_EXISTED(400, "User existed", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(400, "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(400, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
