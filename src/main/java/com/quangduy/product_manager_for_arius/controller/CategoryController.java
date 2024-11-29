@@ -1,6 +1,9 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.Response;
 import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
 import com.quangduy.product_manager_for_arius.service.CategoryService;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -31,40 +36,35 @@ public class CategoryController {
     CategoryService categoryService;
 
     @PostMapping
-    ApiResponse<CategoryResponse> create(@RequestBody @Valid CategoryRequest request) {
-        return ApiResponse.<CategoryResponse>builder()
-                .data(categoryService.create(request))
-                .build();
+    @ApiMessage("Create a category success")
+    ResponseEntity<CategoryResponse> create(@RequestBody @Valid CategoryRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.categoryService.create(request));
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<CategoryResponse>> getAllCategories(Pageable pageable) {
-        return ApiResponse.<ApiPagination<CategoryResponse>>builder()
-                .data(categoryService.getAllCategories(pageable))
-                .build();
+    @ApiMessage("Get all categories success")
+    ResponseEntity<ApiPagination<CategoryResponse>> getAllCategories(Pageable pageable) {
+        return ResponseEntity.ok().body(this.categoryService.getAllCategories(pageable));
     }
 
     @GetMapping("/{categoryId}")
-    ApiResponse<CategoryResponse> getDetailCategory(
+    @ApiMessage("Get detail category success")
+    ResponseEntity<CategoryResponse> getDetailCategory(
             @PathVariable("categoryId") String categoryId) {
-        return ApiResponse.<CategoryResponse>builder()
-                .data(this.categoryService.getDetailCategory(categoryId))
-                .build();
+        return ResponseEntity.ok().body(this.categoryService.getDetailCategory(categoryId));
     }
 
     @PutMapping("/{categoryId}")
-    ApiResponse<CategoryResponse> update(@PathVariable("categoryId") String categoryId,
+    @ApiMessage("Update a category success")
+    ResponseEntity<CategoryResponse> update(@PathVariable("categoryId") String categoryId,
             @RequestBody @Valid CategoryRequest request) {
-        return ApiResponse.<CategoryResponse>builder()
-                .data(categoryService.update(categoryId, request))
-                .build();
+        return ResponseEntity.ok().body(this.categoryService.update(categoryId, request));
     }
 
     @DeleteMapping("/{categoryId}")
-    ApiResponse<String> delete(@PathVariable("categoryId") String categoryId) {
+    @ApiMessage("Delete a category success")
+    ResponseEntity<String> delete(@PathVariable("categoryId") String categoryId) {
         this.categoryService.delete(categoryId);
-        return ApiResponse.<String>builder()
-                .data("Delete success")
-                .build();
+        return ResponseEntity.ok().body(null);
     }
 }

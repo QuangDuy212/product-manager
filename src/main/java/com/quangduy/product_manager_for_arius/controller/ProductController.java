@@ -1,8 +1,8 @@
 package com.quangduy.product_manager_for_arius.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
-import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
-import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.service.ProductService;
-import com.quangduy.product_manager_for_arius.service.importfile.ProductExcelImport;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -38,45 +36,41 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping
-    ApiResponse<ProductResponse> create(@RequestBody @Valid ProductCreationRequest request) {
-        return ApiResponse.<ProductResponse>builder()
-                .data(this.productService.create(request))
-                .build();
+    @ApiMessage("Create a product success")
+    ResponseEntity<ProductResponse> create(@RequestBody @Valid ProductCreationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.productService.create(request));
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<ProductResponse>> getAllProducts(Pageable pageable) {
-        return ApiResponse.<ApiPagination<ProductResponse>>builder()
-                .data(this.productService.getAllProducts(pageable))
-                .build();
+    @ApiMessage("Get all products success")
+    ResponseEntity<ApiPagination<ProductResponse>> getAllProducts(Pageable pageable) {
+        return ResponseEntity.ok().body(this.productService.getAllProducts(pageable));
     }
 
-    @GetMapping("/{productId}")
-    ApiResponse<ProductResponse> getDetailProduct(
-            @PathVariable("productId") String productId) {
-        return ApiResponse.<ProductResponse>builder()
-                .data(this.productService.getDetailProduct(productId))
-                .build();
+    @GetMapping("/{id}")
+    @ApiMessage("Get detail product success")
+    ResponseEntity<ProductResponse> getDetailProduct(
+            @PathVariable("id") String id) {
+        return ResponseEntity.ok().body(this.productService.getDetailProduct(id));
     }
 
-    @PutMapping("/{productId}")
-    ApiResponse<ProductResponse> update(@PathVariable("productId") String productId,
+    @PutMapping("/{id}")
+    @ApiMessage("Update a product success")
+    ResponseEntity<ProductResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid ProductUpdateRequest request) {
-        return ApiResponse.<ProductResponse>builder()
-                .data(this.productService.update(productId, request))
-                .build();
+        return ResponseEntity.ok().body(this.productService.update(id, request));
     }
 
-    @DeleteMapping("/{productId}")
-    ApiResponse<String> delete(@PathVariable("productId") String productId) {
-        this.productService.delete(productId);
-        return ApiResponse.<String>builder()
-                .data("Delete success")
-                .build();
+    @DeleteMapping("/{id}")
+    @ApiMessage("Delete a product success")
+    ResponseEntity<String> delete(@PathVariable("id") String id) {
+        this.productService.delete(id);
+        return ResponseEntity.ok().body("ok");
     }
 
     @PostMapping("/excel/import")
-    public ApiResponse<?> importData(@RequestParam("file") MultipartFile file) {
+    @ApiMessage("Import data success")
+    public ResponseEntity<?> importData(@RequestParam("file") MultipartFile file) {
         return this.productService.importData(file);
     }
 }

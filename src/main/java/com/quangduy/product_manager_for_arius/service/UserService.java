@@ -44,7 +44,7 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     UserExcelImport userExcelImport;
 
-    public UserResponse createUser(UserCreationRequest request) {
+    public UserResponse create(UserCreationRequest request) {
         log.info("Create a user");
         User user = this.userMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
@@ -77,7 +77,7 @@ public class UserService {
     }
 
     @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse updateUser(String userId, UserUpdateRequest request) {
+    public UserResponse update(String userId, UserUpdateRequest request) {
         log.info("Update a user");
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -91,13 +91,13 @@ public class UserService {
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(String userId) {
+    public void delete(String userId) {
         log.info("Delete a user");
         userRepository.deleteById(userId);
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
-    public ApiPagination<UserResponse> getUsers(Pageable pageable) {
+    public ApiPagination<UserResponse> getAllUsers(Pageable pageable) {
         log.info("Get all users");
         Page<User> pageUser = this.userRepository.findAll(pageable);
 
@@ -117,7 +117,7 @@ public class UserService {
                 .build();
     }
 
-    public List<UserResponse> getUsers() {
+    public List<UserResponse> getAllUsers() {
         log.info("Get all users");
         List<User> entities = this.userRepository.findAll();
         List<UserResponse> res = entities.stream().map(userMapper::toUserResponse).toList();
@@ -125,7 +125,7 @@ public class UserService {
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
-    public UserResponse getUser(String id) {
+    public UserResponse getDetailUser(String id) {
         log.info("Get detail a user");
         return userMapper.toUserResponse(
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));

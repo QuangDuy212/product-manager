@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,7 @@ import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.service.OrderService;
 import com.quangduy.product_manager_for_arius.service.export.OrderExcelExporter;
 import com.quangduy.product_manager_for_arius.service.export.UserExcelExporter;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -43,48 +46,43 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping
-    ApiResponse<OrderResponse> create(@RequestBody @Valid OrderCreationRequest request) {
-        return ApiResponse.<OrderResponse>builder()
-                .data(this.orderService.create(request))
-                .build();
+    @ApiMessage("Create a order success")
+    ResponseEntity<OrderResponse> create(@RequestBody @Valid OrderCreationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.orderService.create(request));
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<OrderResponse>> getAllEntities(Pageable pageable) {
-        return ApiResponse.<ApiPagination<OrderResponse>>builder()
-                .data(this.orderService.getAllOrders(pageable))
-                .build();
+    @ApiMessage("Get all orders success")
+    ResponseEntity<ApiPagination<OrderResponse>> getAllEntities(Pageable pageable) {
+        return ResponseEntity.ok().body(this.orderService.getAllOrders(pageable));
     }
 
     @GetMapping("/history")
-    ApiResponse<ApiPagination<OrderResponse>> getHistory(Pageable pageable) {
-        return ApiResponse.<ApiPagination<OrderResponse>>builder()
-                .data(this.orderService.getHistory(pageable))
-                .build();
+    @ApiMessage("Get history success")
+    ResponseEntity<ApiPagination<OrderResponse>> getHistory(Pageable pageable) {
+        return ResponseEntity.ok().body(this.orderService.getHistory(pageable));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<OrderResponse> getDetailEntity(
+    @ApiMessage("Get detail order success")
+    ResponseEntity<OrderResponse> getDetailEntity(
             @PathVariable("id") String id) {
-        return ApiResponse.<OrderResponse>builder()
-                .data(this.orderService.getDetailOrder(id))
-                .build();
+        return ResponseEntity.ok().body(this.orderService.getDetailOrder(id));
     }
 
     @PutMapping("/{id}")
-    ApiResponse<OrderResponse> update(@PathVariable("id") String id,
+    @ApiMessage("Update a order success")
+    ResponseEntity<OrderResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid OrderUpdateRequest request) {
-        return ApiResponse.<OrderResponse>builder()
-                .data(this.orderService.update(id, request))
-                .build();
+        return ResponseEntity.ok().body(this.orderService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<String> delete(@PathVariable("id") String id) {
+    @ApiMessage("Delete a order success")
+    ResponseEntity<String> delete(@PathVariable("id") String id) {
         this.orderService.delete(id);
-        return ApiResponse.<String>builder()
-                .data("Delete success")
-                .build();
+        return ResponseEntity.ok().body("ok");
+
     }
 
     @GetMapping("/export/excel")

@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -136,26 +138,20 @@ public class ProductService {
         return res;
     }
 
-    public ApiResponse<?> importData(MultipartFile file) {
+    public ResponseEntity<?> importData(MultipartFile file) {
         String message = "";
         if (productExcelImport.hasExcelFormat(file)) {
             try {
                 List<ProductResponse> res = this.saveFromFileExcel(file);
                 message = "The Excel file is uploaded: " + file.getOriginalFilename();
-                return ApiResponse.<List<ProductResponse>>builder()
-                        .data(res)
-                        .build();
+                return ResponseEntity.ok().body(res);
             } catch (Exception exp) {
                 message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
                 // return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-                return ApiResponse.<String>builder()
-                        .data(message)
-                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
             }
         }
         message = "Please upload an excel file!";
-        return ApiResponse.<String>builder()
-                .data(message)
-                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 }

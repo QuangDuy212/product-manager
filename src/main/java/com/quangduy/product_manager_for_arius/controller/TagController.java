@@ -1,6 +1,8 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,7 @@ import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.TagResponse;
 import com.quangduy.product_manager_for_arius.service.TagService;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -31,40 +34,35 @@ public class TagController {
     TagService tagService;
 
     @PostMapping
-    ApiResponse<TagResponse> create(@RequestBody @Valid TagRequest request) {
-        return ApiResponse.<TagResponse>builder()
-                .data(this.tagService.create(request))
-                .build();
+    @ApiMessage("Create a tag success")
+    ResponseEntity<TagResponse> create(@RequestBody @Valid TagRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.tagService.create(request));
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<TagResponse>> getAllCategories(Pageable pageable) {
-        return ApiResponse.<ApiPagination<TagResponse>>builder()
-                .data(this.tagService.getAllTags(pageable))
-                .build();
+    @ApiMessage("Get all tags success")
+    ResponseEntity<ApiPagination<TagResponse>> getAllTags(Pageable pageable) {
+        return ResponseEntity.ok().body(this.tagService.getAllTags(pageable));
     }
 
-    @GetMapping("/{tagId}")
-    ApiResponse<TagResponse> getDetailCategory(
-            @PathVariable("tagId") String tagId) {
-        return ApiResponse.<TagResponse>builder()
-                .data(this.tagService.getDetailTag(tagId))
-                .build();
+    @GetMapping("/{id}")
+    @ApiMessage("Get detail tag success")
+    ResponseEntity<TagResponse> getDetailTag(
+            @PathVariable("id") String id) {
+        return ResponseEntity.ok().body(this.tagService.getDetailTag(id));
     }
 
-    @PutMapping("/{tagId}")
-    ApiResponse<TagResponse> update(@PathVariable("tagId") String tagId,
+    @PutMapping("/{id}")
+    @ApiMessage("Update a tag success")
+    ResponseEntity<TagResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid TagRequest request) {
-        return ApiResponse.<TagResponse>builder()
-                .data(this.tagService.update(tagId, request))
-                .build();
+        return ResponseEntity.ok().body(this.tagService.update(id, request));
     }
 
-    @DeleteMapping("/{tagId}")
-    ApiResponse<String> delete(@PathVariable("tagId") String tagId) {
-        this.tagService.delete(tagId);
-        return ApiResponse.<String>builder()
-                .data("Delete success")
-                .build();
+    @DeleteMapping("/{id}")
+    @ApiMessage("Delete a tag success")
+    ResponseEntity<String> delete(@PathVariable("id") String id) {
+        this.tagService.delete(id);
+        return ResponseEntity.ok().body("ok");
     }
 }

@@ -1,6 +1,8 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.Response;
 import com.quangduy.product_manager_for_arius.dto.request.OrderDetailRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.OrderDetailResponse;
 import com.quangduy.product_manager_for_arius.service.OrderDetailService;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -31,40 +35,35 @@ public class OrderDetailController {
     OrderDetailService orderDetailService;
 
     @PostMapping
-    ApiResponse<OrderDetailResponse> create(@RequestBody @Valid OrderDetailRequest request) {
-        return ApiResponse.<OrderDetailResponse>builder()
-                .data(this.orderDetailService.create(request))
-                .build();
+    @ApiMessage("Create a order detail success")
+    ResponseEntity<OrderDetailResponse> create(@RequestBody @Valid OrderDetailRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.orderDetailService.create(request));
     }
 
     @GetMapping
-    ApiResponse<ApiPagination<OrderDetailResponse>> getAllEntities(Pageable pageable) {
-        return ApiResponse.<ApiPagination<OrderDetailResponse>>builder()
-                .data(this.orderDetailService.getAllOrders(pageable))
-                .build();
+    @ApiMessage("Get all orders detail success")
+    ResponseEntity<ApiPagination<OrderDetailResponse>> getAllEntities(Pageable pageable) {
+        return ResponseEntity.ok().body(this.orderDetailService.getAllOrders(pageable));
     }
 
     @GetMapping("/{id}")
-    ApiResponse<OrderDetailResponse> getDetailEntity(
+    @ApiMessage("Get a order detail success")
+    ResponseEntity<OrderDetailResponse> getDetailEntity(
             @PathVariable("id") String id) {
-        return ApiResponse.<OrderDetailResponse>builder()
-                .data(this.orderDetailService.getDetailOrder(id))
-                .build();
+        return ResponseEntity.ok().body(this.orderDetailService.getDetailOrder(id));
     }
 
     @PutMapping("/{id}")
-    ApiResponse<OrderDetailResponse> update(@PathVariable("id") String id,
+    @ApiMessage("Update a order detail success")
+    ResponseEntity<OrderDetailResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid OrderDetailRequest request) {
-        return ApiResponse.<OrderDetailResponse>builder()
-                .data(this.orderDetailService.update(id, request))
-                .build();
+        return ResponseEntity.ok().body(this.orderDetailService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<String> delete(@PathVariable("id") String id) {
+    @ApiMessage("Delete a order detail success")
+    ResponseEntity<String> delete(@PathVariable("id") String id) {
         this.orderDetailService.delete(id);
-        return ApiResponse.<String>builder()
-                .data("Delete success")
-                .build();
+        return ResponseEntity.ok().body("ok");
     }
 }
