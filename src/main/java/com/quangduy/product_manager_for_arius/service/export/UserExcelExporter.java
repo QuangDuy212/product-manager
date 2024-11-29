@@ -40,7 +40,7 @@ public class UserExcelExporter {
         createCell(row, 2, "First Name", style);
         createCell(row, 3, "Last Name", style);
         createCell(row, 4, "Roles", style);
-        createCell(row, 5, "Date of birth", style);
+        createCell(row, 5, "Address", style);
 
     }
 
@@ -74,7 +74,7 @@ public class UserExcelExporter {
             createCell(row, columnCount++, user.getFirstName(), style);
             createCell(row, columnCount++, user.getLastName(), style);
             createCell(row, columnCount++, user.getRole(), style);
-            createCell(row, columnCount++, user.getDob(), style);
+            createCell(row, columnCount++, user.getAddress(), style);
 
         }
     }

@@ -19,10 +19,12 @@ import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.UserUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.entity.Role;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.UserMapper;
+import com.quangduy.product_manager_for_arius.repository.RoleRepository;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
 import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;
 
@@ -37,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    RoleService roleService;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     UserExcelImport userExcelImport;
@@ -48,8 +51,11 @@ public class UserService {
 
         if (request.getRole() == null) {
             request.setRole(PredefinedRole.USER_ROLE);
-            user.setRole(request.getRole());
-
+            Role role = this.roleService.findByName(PredefinedRole.USER_ROLE);
+            user.setRole(role);
+        } else {
+            Role role = this.roleService.findByName(request.getRole());
+            user.setRole(role);
         }
 
         try {
@@ -78,17 +84,20 @@ public class UserService {
 
         userMapper.updateUser(user, request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        if (request.getRole() != null) {
+            Role role = this.roleService.findByName(request.getRole());
+            user.setRole(role);
+        }
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userId) {
         log.info("Delete a user");
         userRepository.deleteById(userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ApiPagination<UserResponse> getUsers(Pageable pageable) {
         log.info("Get all users");
         Page<User> pageUser = this.userRepository.findAll(pageable);
@@ -116,7 +125,7 @@ public class UserService {
         return res;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
         log.info("Get detail a user");
         return userMapper.toUserResponse(

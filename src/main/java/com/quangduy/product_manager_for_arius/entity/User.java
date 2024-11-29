@@ -35,8 +35,11 @@ public class User {
     String firstName;
     String lastName;
     String address;
-    String role;
 
     @OneToMany(mappedBy = "user")
     List<Order> orders;
+
+    @ManyToOne
+    @JoinColumn(name = "role_name")
+    Role role;
 }

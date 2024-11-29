@@ -29,6 +29,7 @@ import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
 import com.quangduy.product_manager_for_arius.dto.response.IntrospectResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.entity.Role;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
@@ -51,6 +52,7 @@ public class AuthenticationService {
     AuthenticationManagerBuilder authenticationManagerBuilder;
     SecurityUtil securityUtil;
     UserService userService;
+    RoleService roleService;
     PasswordEncoder passwordEncoder;
     AuthMapper authMapper;
     UserMapper userMapper;
@@ -130,7 +132,11 @@ public class AuthenticationService {
         User user = this.authMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
         if (request.getRole() == null) {
-            user.setRole(PredefinedRole.USER_ROLE.toString());
+            Role role = this.roleService.findByName(PredefinedRole.USER_ROLE.toString());
+            user.setRole(role);
+        } else {
+            Role role = this.roleService.findByName(request.getRole());
+            user.setRole(role);
         }
         user = this.userRepository.save(user);
         UserResponse response = this.authMapper.toUserResponse(user);

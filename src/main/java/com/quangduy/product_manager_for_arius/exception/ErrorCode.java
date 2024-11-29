@@ -23,6 +23,7 @@ public enum ErrorCode {
     CATEGORY_EXISTED(400, "This category is existed", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(400, "This product not found", HttpStatus.BAD_REQUEST),
     ORDER_NOT_FOUND(400, "This order not found", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXISTED(400, "Role not existed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

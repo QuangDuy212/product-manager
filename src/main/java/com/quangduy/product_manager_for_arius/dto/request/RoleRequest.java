@@ -1,9 +1,5 @@
 package com.quangduy.product_manager_for_arius.dto.request;
 
-import java.time.LocalDate;
-
-import com.quangduy.product_manager_for_arius.validator.DobConstraint;
-
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,16 +13,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserCreationRequest {
-    @Size(min = 4, message = "USERNAME_INVALID")
-    String username;
-
-    @Size(min = 6, message = "INVALID_PASSWORD")
-    String password;
-
-    String firstName;
-    String lastName;
-    String address;
-
-    String role;
+public class RoleRequest {
+    @Size(min = 3, message = "INVALID_ROLE_NAME")
+    String name;
+    String description;
 }

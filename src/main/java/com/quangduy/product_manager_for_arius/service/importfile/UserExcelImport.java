@@ -17,18 +17,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.quangduy.product_manager_for_arius.entity.Role;
 import com.quangduy.product_manager_for_arius.entity.User;
+import com.quangduy.product_manager_for_arius.service.RoleService;
 
 @Service
 public class UserExcelImport {
   private PasswordEncoder passwordEncoder;
+  private RoleService roleService;
 
-  public UserExcelImport(PasswordEncoder passwordEncoder) {
+  public UserExcelImport(PasswordEncoder passwordEncoder, RoleService roleService) {
     this.passwordEncoder = passwordEncoder;
+    this.roleService = roleService;
   }
 
   public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  static String[] HEADERs = { "Username", "Password", "First Name", "Last Name", "Roles", "Date of birth" };
+  static String[] HEADERs = { "Username", "Password", "First Name", "Last Name", "Roles", "Address" };
   static String SHEET = "Users";
 
   public boolean hasExcelFormat(MultipartFile file) {
@@ -73,10 +77,11 @@ public class UserExcelImport {
               stu.setLastName(currentCell.getStringCellValue());
               break;
             case 4:
-              stu.setRole(currentCell.getStringCellValue());
+              Role role = this.roleService.findByName(currentCell.getStringCellValue());
+              stu.setRole(role);
               break;
             case 5:
-              stu.setDob(LocalDate.ofInstant(currentCell.getDateCellValue().toInstant(), ZoneId.systemDefault()));
+              stu.setAddress(currentCell.getStringCellValue());
               break;
             default:
               break;

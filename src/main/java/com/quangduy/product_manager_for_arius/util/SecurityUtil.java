@@ -73,7 +73,8 @@ public class SecurityUtil {
                 .claim("permission", listAuthority)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+        String a = this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+        return a;
     }
 
     public String createRefreshToken(String email, AuthenticationResponse dto) {
