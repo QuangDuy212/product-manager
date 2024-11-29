@@ -18,5 +18,5 @@ public class ApiResponse<T> {
     @Builder.Default
     private Object message = "CALL API SUCCESS";
     private String error;
-    private T result;
+    private T data;
 }

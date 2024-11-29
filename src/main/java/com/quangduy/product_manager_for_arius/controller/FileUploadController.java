@@ -27,7 +27,7 @@ public class FileUploadController {
             @RequestParam("folder") String folder)
             throws IOException {
         return ApiResponse.<String>builder()
-                .result(fileUploadService.uploadFile(file, "quangduy/" + folder))
+                .data(fileUploadService.uploadFile(file, "quangduy/" + folder))
                 .build();
     }
 }

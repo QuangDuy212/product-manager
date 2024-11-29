@@ -33,14 +33,14 @@ public class OrderDetailController {
     @PostMapping
     ApiResponse<OrderDetailResponse> create(@RequestBody @Valid OrderDetailRequest request) {
         return ApiResponse.<OrderDetailResponse>builder()
-                .result(this.orderDetailService.create(request))
+                .data(this.orderDetailService.create(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<OrderDetailResponse>> getAllEntities(Pageable pageable) {
         return ApiResponse.<ApiPagination<OrderDetailResponse>>builder()
-                .result(this.orderDetailService.getAllOrders(pageable))
+                .data(this.orderDetailService.getAllOrders(pageable))
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class OrderDetailController {
     ApiResponse<OrderDetailResponse> getDetailEntity(
             @PathVariable("id") String id) {
         return ApiResponse.<OrderDetailResponse>builder()
-                .result(this.orderDetailService.getDetailOrder(id))
+                .data(this.orderDetailService.getDetailOrder(id))
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class OrderDetailController {
     ApiResponse<OrderDetailResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid OrderDetailRequest request) {
         return ApiResponse.<OrderDetailResponse>builder()
-                .result(this.orderDetailService.update(id, request))
+                .data(this.orderDetailService.update(id, request))
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class OrderDetailController {
     ApiResponse<String> delete(@PathVariable("id") String id) {
         this.orderDetailService.delete(id);
         return ApiResponse.<String>builder()
-                .result("Delete success")
+                .data("Delete success")
                 .build();
     }
 }

@@ -143,19 +143,19 @@ public class ProductService {
                 List<ProductResponse> res = this.saveFromFileExcel(file);
                 message = "The Excel file is uploaded: " + file.getOriginalFilename();
                 return ApiResponse.<List<ProductResponse>>builder()
-                        .result(res)
+                        .data(res)
                         .build();
             } catch (Exception exp) {
                 message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
                 // return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
                 return ApiResponse.<String>builder()
-                        .result(message)
+                        .data(message)
                         .build();
             }
         }
         message = "Please upload an excel file!";
         return ApiResponse.<String>builder()
-                .result(message)
+                .data(message)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,8 @@ import com.quangduy.product_manager_for_arius.dto.response.AuthenticationRespons
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.service.AuthenticationService;
+import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,45 +32,33 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
-        var result = authenticationService.login(request);
-        return ApiResponse.<AuthenticationResponse>builder()
-                .message("Login success")
-                .result(result)
-                .build();
+    @ApiMessage("Login success")
+    ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+        return authenticationService.login(request);
     }
 
     @PostMapping("/register")
-    ApiResponse<UserResponse> register(@Valid @RequestBody UserCreationRequest request) throws AppException {
-        return ApiResponse.<UserResponse>builder()
-                .message("Register success")
-                .result(this.authenticationService.register(request))
-                .build();
+    @ApiMessage("Register success")
+    ResponseEntity<UserResponse> register(@Valid @RequestBody UserCreationRequest request) throws AppException {
+        return this.authenticationService.register(request);
     }
 
     @GetMapping("/account")
-    ApiResponse<UserResponse> getAccount() {
-        return ApiResponse.<UserResponse>builder()
-                .message("Get account success")
-                .result(this.authenticationService.getAccount())
-                .build();
+    @ApiMessage("Get account success")
+    ResponseEntity<UserResponse> getAccount() {
+        return this.authenticationService.getAccount();
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout() {
-        this.authenticationService.logout();
-        return ApiResponse.<Void>builder()
-                .message("Logout success")
-                .result(null)
-                .build();
+    @ApiMessage("Logout success")
+    ResponseEntity<Void> logout() {
+        return this.authenticationService.logout();
     }
 
     @PostMapping("/refresh")
-    ApiResponse<AuthenticationResponse> refreshToken(
+    @ApiMessage("Logout success")
+    ResponseEntity<AuthenticationResponse> refreshToken(
             @CookieValue(name = "refresh_token", defaultValue = "duy") String refresh_token) {
-        return ApiResponse.<AuthenticationResponse>builder()
-                .message("Logout success")
-                .result(this.authenticationService.refreshToken(refresh_token))
-                .build();
+        return this.authenticationService.refreshToken(refresh_token);
     }
 }

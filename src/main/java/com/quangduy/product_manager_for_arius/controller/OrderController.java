@@ -45,21 +45,21 @@ public class OrderController {
     @PostMapping
     ApiResponse<OrderResponse> create(@RequestBody @Valid OrderCreationRequest request) {
         return ApiResponse.<OrderResponse>builder()
-                .result(this.orderService.create(request))
+                .data(this.orderService.create(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<OrderResponse>> getAllEntities(Pageable pageable) {
         return ApiResponse.<ApiPagination<OrderResponse>>builder()
-                .result(this.orderService.getAllOrders(pageable))
+                .data(this.orderService.getAllOrders(pageable))
                 .build();
     }
 
     @GetMapping("/history")
     ApiResponse<ApiPagination<OrderResponse>> getHistory(Pageable pageable) {
         return ApiResponse.<ApiPagination<OrderResponse>>builder()
-                .result(this.orderService.getHistory(pageable))
+                .data(this.orderService.getHistory(pageable))
                 .build();
     }
 
@@ -67,7 +67,7 @@ public class OrderController {
     ApiResponse<OrderResponse> getDetailEntity(
             @PathVariable("id") String id) {
         return ApiResponse.<OrderResponse>builder()
-                .result(this.orderService.getDetailOrder(id))
+                .data(this.orderService.getDetailOrder(id))
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class OrderController {
     ApiResponse<OrderResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid OrderUpdateRequest request) {
         return ApiResponse.<OrderResponse>builder()
-                .result(this.orderService.update(id, request))
+                .data(this.orderService.update(id, request))
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class OrderController {
     ApiResponse<String> delete(@PathVariable("id") String id) {
         this.orderService.delete(id);
         return ApiResponse.<String>builder()
-                .result("Delete success")
+                .data("Delete success")
                 .build();
     }
 

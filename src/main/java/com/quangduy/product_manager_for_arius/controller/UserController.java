@@ -46,41 +46,41 @@ public class UserController {
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
+                .data(userService.createUser(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<UserResponse>> getUsers(Pageable pageable) {
         return ApiResponse.<ApiPagination<UserResponse>>builder()
-                .result(userService.getUsers(pageable))
+                .data(userService.getUsers(pageable))
                 .build();
     }
 
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(userId))
+                .data(userService.getUser(userId))
                 .build();
     }
 
     @GetMapping("/my-info")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getMyInfo())
+                .data(userService.getMyInfo())
                 .build();
     }
 
     @DeleteMapping("/{userId}")
     ApiResponse<String> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
-        return ApiResponse.<String>builder().result("User has been deleted").build();
+        return ApiResponse.<String>builder().data("User has been deleted").build();
     }
 
     @PutMapping("/{userId}")
     ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.updateUser(userId, request))
+                .data(userService.updateUser(userId, request))
                 .build();
     }
 
@@ -101,7 +101,7 @@ public class UserController {
         excelExporter.export(response);
 
         return ApiResponse.<String>builder()
-                .result("Export success")
+                .data("Export success")
                 .build();
     }
 
@@ -113,19 +113,19 @@ public class UserController {
                 List<UserResponse> res = userService.saveFromFileExcel(file);
                 message = "The Excel file is uploaded: " + file.getOriginalFilename();
                 return ApiResponse.<List<UserResponse>>builder()
-                        .result(res)
+                        .data(res)
                         .build();
             } catch (Exception exp) {
                 message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
                 // return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
                 return ApiResponse.<String>builder()
-                        .result(message)
+                        .data(message)
                         .build();
             }
         }
         message = "Please upload an excel file!";
         return ApiResponse.<String>builder()
-                .result(message)
+                .data(message)
                 .build();
     }
 }

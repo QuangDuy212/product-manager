@@ -33,14 +33,14 @@ public class CategoryController {
     @PostMapping
     ApiResponse<CategoryResponse> create(@RequestBody @Valid CategoryRequest request) {
         return ApiResponse.<CategoryResponse>builder()
-                .result(categoryService.create(request))
+                .data(categoryService.create(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<CategoryResponse>> getAllCategories(Pageable pageable) {
         return ApiResponse.<ApiPagination<CategoryResponse>>builder()
-                .result(categoryService.getAllCategories(pageable))
+                .data(categoryService.getAllCategories(pageable))
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class CategoryController {
     ApiResponse<CategoryResponse> getDetailCategory(
             @PathVariable("categoryId") String categoryId) {
         return ApiResponse.<CategoryResponse>builder()
-                .result(this.categoryService.getDetailCategory(categoryId))
+                .data(this.categoryService.getDetailCategory(categoryId))
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class CategoryController {
     ApiResponse<CategoryResponse> update(@PathVariable("categoryId") String categoryId,
             @RequestBody @Valid CategoryRequest request) {
         return ApiResponse.<CategoryResponse>builder()
-                .result(categoryService.update(categoryId, request))
+                .data(categoryService.update(categoryId, request))
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class CategoryController {
     ApiResponse<String> delete(@PathVariable("categoryId") String categoryId) {
         this.categoryService.delete(categoryId);
         return ApiResponse.<String>builder()
-                .result("Delete success")
+                .data("Delete success")
                 .build();
     }
 }

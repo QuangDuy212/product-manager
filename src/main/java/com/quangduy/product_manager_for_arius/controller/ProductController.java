@@ -40,14 +40,14 @@ public class ProductController {
     @PostMapping
     ApiResponse<ProductResponse> create(@RequestBody @Valid ProductCreationRequest request) {
         return ApiResponse.<ProductResponse>builder()
-                .result(this.productService.create(request))
+                .data(this.productService.create(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<ProductResponse>> getAllProducts(Pageable pageable) {
         return ApiResponse.<ApiPagination<ProductResponse>>builder()
-                .result(this.productService.getAllProducts(pageable))
+                .data(this.productService.getAllProducts(pageable))
                 .build();
     }
 
@@ -55,7 +55,7 @@ public class ProductController {
     ApiResponse<ProductResponse> getDetailProduct(
             @PathVariable("productId") String productId) {
         return ApiResponse.<ProductResponse>builder()
-                .result(this.productService.getDetailProduct(productId))
+                .data(this.productService.getDetailProduct(productId))
                 .build();
     }
 
@@ -63,7 +63,7 @@ public class ProductController {
     ApiResponse<ProductResponse> update(@PathVariable("productId") String productId,
             @RequestBody @Valid ProductUpdateRequest request) {
         return ApiResponse.<ProductResponse>builder()
-                .result(this.productService.update(productId, request))
+                .data(this.productService.update(productId, request))
                 .build();
     }
 
@@ -71,7 +71,7 @@ public class ProductController {
     ApiResponse<String> delete(@PathVariable("productId") String productId) {
         this.productService.delete(productId);
         return ApiResponse.<String>builder()
-                .result("Delete success")
+                .data("Delete success")
                 .build();
     }
 

@@ -33,14 +33,14 @@ public class TagController {
     @PostMapping
     ApiResponse<TagResponse> create(@RequestBody @Valid TagRequest request) {
         return ApiResponse.<TagResponse>builder()
-                .result(this.tagService.create(request))
+                .data(this.tagService.create(request))
                 .build();
     }
 
     @GetMapping
     ApiResponse<ApiPagination<TagResponse>> getAllCategories(Pageable pageable) {
         return ApiResponse.<ApiPagination<TagResponse>>builder()
-                .result(this.tagService.getAllTags(pageable))
+                .data(this.tagService.getAllTags(pageable))
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class TagController {
     ApiResponse<TagResponse> getDetailCategory(
             @PathVariable("tagId") String tagId) {
         return ApiResponse.<TagResponse>builder()
-                .result(this.tagService.getDetailTag(tagId))
+                .data(this.tagService.getDetailTag(tagId))
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class TagController {
     ApiResponse<TagResponse> update(@PathVariable("tagId") String tagId,
             @RequestBody @Valid TagRequest request) {
         return ApiResponse.<TagResponse>builder()
-                .result(this.tagService.update(tagId, request))
+                .data(this.tagService.update(tagId, request))
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class TagController {
     ApiResponse<String> delete(@PathVariable("tagId") String tagId) {
         this.tagService.delete(tagId);
         return ApiResponse.<String>builder()
-                .result("Delete success")
+                .data("Delete success")
                 .build();
     }
 }

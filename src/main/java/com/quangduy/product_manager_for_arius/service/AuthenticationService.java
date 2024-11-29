@@ -79,7 +79,7 @@ public class AuthenticationService {
         return ResponseEntity.ok().body(IntrospectResponse.builder().valid(isValid).build());
     }
 
-    public AuthenticationResponse login(AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
         // Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername(), request.getPassword());
@@ -114,13 +114,13 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
-        ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(res);
-        return res;
+
     }
 
-    public UserResponse register(UserCreationRequest request) throws AppException {
+    public ResponseEntity<UserResponse> register(UserCreationRequest request) throws AppException {
 
         String hashPass = passwordEncoder.encode(request.getPassword());
         request.setPassword(hashPass);
@@ -139,21 +139,19 @@ public class AuthenticationService {
         }
         user = this.userRepository.save(user);
         UserResponse response = this.authMapper.toUserResponse(user);
-        ResponseEntity.status(HttpStatus.CREATED).body(response);
-        return response;
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public UserResponse getAccount() {
+    public ResponseEntity<UserResponse> getAccount() {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
 
         User currentUserDB = this.userService.handleGetUserByUsername(email);
         UserResponse res = this.userMapper.toUserResponse(currentUserDB);
-        ResponseEntity.ok().body(res);
-        return res;
+        return ResponseEntity.ok().body(res);
     }
 
-    public void logout() throws AppException {
+    public ResponseEntity<Void> logout() throws AppException {
         String username = SecurityUtil.getCurrentUserLogin().isPresent()
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
@@ -173,12 +171,12 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(0)
                 .build();
-        ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
                 .body(null);
     }
 
-    public AuthenticationResponse refreshToken(String refresh_token) throws AppException {
+    public ResponseEntity<AuthenticationResponse> refreshToken(String refresh_token) throws AppException {
         // check valid token
         if (refresh_token.equals("duy")) {
             throw new AppException(ErrorCode.COOKIES_EMPTY);
@@ -218,10 +216,9 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
-        ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(res);
-        return res;
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh)
