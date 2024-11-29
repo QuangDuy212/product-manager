@@ -98,7 +98,6 @@ public class AuthenticationService {
             res.setUser(this.authMapper.toUserResponse(currentUserDB));
         }
         // create a token
-        String name = authentication.getName();
         String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
         res.setAccessToken(access_token);
 
@@ -121,7 +120,7 @@ public class AuthenticationService {
         return res;
     }
 
-    public ResponseEntity<UserResponse> register(UserCreationRequest request) throws AppException {
+    public UserResponse register(UserCreationRequest request) throws AppException {
 
         String hashPass = passwordEncoder.encode(request.getPassword());
         request.setPassword(hashPass);
@@ -140,19 +139,21 @@ public class AuthenticationService {
         }
         user = this.userRepository.save(user);
         UserResponse response = this.authMapper.toUserResponse(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return response;
     }
 
-    public ResponseEntity<UserResponse> getAccount() {
+    public UserResponse getAccount() {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
 
         User currentUserDB = this.userService.handleGetUserByUsername(email);
         UserResponse res = this.userMapper.toUserResponse(currentUserDB);
-        return ResponseEntity.ok().body(res);
+        ResponseEntity.ok().body(res);
+        return res;
     }
 
-    public ResponseEntity<Void> logout() throws AppException {
+    public void logout() throws AppException {
         String username = SecurityUtil.getCurrentUserLogin().isPresent()
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
@@ -172,12 +173,12 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(0)
                 .build();
-        return ResponseEntity.ok()
+        ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
                 .body(null);
     }
 
-    public ResponseEntity<AuthenticationResponse> refreshToken(String refresh_token) throws AppException {
+    public AuthenticationResponse refreshToken(String refresh_token) throws AppException {
         // check valid token
         if (refresh_token.equals("duy")) {
             throw new AppException(ErrorCode.COOKIES_EMPTY);
@@ -217,9 +218,10 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
-        return ResponseEntity.ok()
+        ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(res);
+        return res;
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh)

@@ -16,13 +16,11 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
+import com.quangduy.product_manager_for_arius.dto.response.UserInToken;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -55,7 +53,11 @@ public class SecurityUtil {
 
     public String createAccessToken(String username, UserResponse dto) {
         // user info inside token
-
+        UserInToken user = UserInToken.builder()
+                .id(dto.getId())
+                .username(username)
+                .role(dto.getRole().getName())
+                .build();
         // time
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
@@ -69,7 +71,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(username)
-                .claim("user", dto)
+                .claim("user", user)
                 .claim("permission", listAuthority)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -77,9 +79,13 @@ public class SecurityUtil {
         return a;
     }
 
-    public String createRefreshToken(String email, AuthenticationResponse dto) {
+    public String createRefreshToken(String username, AuthenticationResponse dto) {
         // user info inside token
-
+        UserInToken user = UserInToken.builder()
+                .id(dto.getUser().getId())
+                .username(username)
+                .role(dto.getUser().getRole().getName())
+                .build();
         // time
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
@@ -88,8 +94,8 @@ public class SecurityUtil {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(email)
-                .claim("user", dto.getUser())
+                .subject(username)
+                .claim("user", user)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
