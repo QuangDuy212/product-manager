@@ -23,7 +23,8 @@ public class SecurityConfiguration {
                         CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
 
                 String[] whileList = {
-                                "/", "/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/register",
+                                "/", "/auth/login", "/auth/refresh", "/auth/register",
+                                "/roles/**",
                                 "/storage/**", "/email/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/users/**"
                 };

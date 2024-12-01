@@ -1,8 +1,5 @@
 package com.quangduy.product_manager_for_arius.dto.request;
 
-import java.util.List;
-
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +12,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleRequest {
-    @Size(min = 3, message = "INVALID_ROLE_NAME")
+public class PermissionRequest {
     String name;
-    String description;
+    String apiPath;
+    String method;
+    String module;
     boolean active;
-    List<String> perIds;
 }

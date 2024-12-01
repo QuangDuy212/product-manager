@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
-import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.User;
 

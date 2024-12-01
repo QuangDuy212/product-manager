@@ -1,10 +1,7 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.quangduy.product_manager_for_arius.entity.Permission;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,10 +16,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonPropertyOrder(alphabetic = true)
-public class RoleResponse {
+public class PermissionResponse {
     @JsonProperty("_id")
     String id;
     String name;
-    String description;
-    List<Permission> permissions;
+    String apiPath;
+    String method;
+    String module;
+    boolean active;
 }
