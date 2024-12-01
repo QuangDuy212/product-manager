@@ -1,8 +1,10 @@
 package com.quangduy.product_manager_for_arius.entity;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,31 +20,23 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity(name = "users")
+@Entity(name = "cartdetails")
 @JsonPropertyOrder(alphabetic = true)
-public class User {
+public class CartDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty("_id")
     String id;
-
-    @Column(columnDefinition = "TEXT")
-    String refreshToken;
-
-    @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255)")
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    String address;
-
-    @OneToMany(mappedBy = "user")
-    List<Order> orders;
+    long quantity;
+    double price;
 
     @ManyToOne
-    @JoinColumn(name = "role_name")
-    Role role;
+    @JoinColumn(name = "cart_id")
+    @JsonIgnore
+    Cart cart;
 
-    @OneToOne(mappedBy = "user")
-    private Cart cart;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -39,5 +40,7 @@ public class Product {
     List<Tag> tags;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     List<OrderDetail> orderDetails;
+
 }

@@ -95,9 +95,15 @@ public class ProductService {
 
     public ProductResponse getDetailProduct(String productId) {
         log.info("Get detail product");
-        Product tagDB = this.productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        return this.productMapper.toProductResponse(tagDB);
+        Product entity = this.productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        return this.productMapper.toProductResponse(entity);
+    }
+
+    public Product getProductById(String id) {
+        Product entity = this.productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        return entity;
     }
 
     public ApiPagination<ProductResponse> getAllProducts(Pageable pageable) {
@@ -153,5 +159,9 @@ public class ProductService {
         }
         message = "Please upload an excel file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    public List<Product> getListProducts(List<String> productIds) {
+        return this.productRepository.findByIdIn(productIds);
     }
 }
