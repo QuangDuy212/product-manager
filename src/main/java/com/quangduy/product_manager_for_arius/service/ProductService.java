@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -106,9 +107,9 @@ public class ProductService {
         return entity;
     }
 
-    public ApiPagination<ProductResponse> getAllProducts(Pageable pageable) {
+    public ApiPagination<ProductResponse> getAllProducts(Specification<Product> spec, Pageable pageable) {
         log.info("Get all products");
-        Page<Product> page = this.productRepository.findAll(pageable);
+        Page<Product> page = this.productRepository.findAll(spec, pageable);
 
         List<ProductResponse> list = page.getContent().stream()
                 .map(productMapper::toProductResponse).toList();

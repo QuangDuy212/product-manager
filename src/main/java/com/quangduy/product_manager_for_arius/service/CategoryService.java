@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
@@ -53,9 +54,9 @@ public class CategoryService {
         return this.categoryMapper.toCategoryResponse(categoryDB);
     }
 
-    public ApiPagination<CategoryResponse> getAllCategories(Pageable pageable) {
+    public ApiPagination<CategoryResponse> getAllCategories(Specification<Category> spec, Pageable pageable) {
         log.info("Get all categories");
-        Page<Category> pageCategories = this.categoryRepository.findAll(pageable);
+        Page<Category> pageCategories = this.categoryRepository.findAll(spec, pageable);
 
         List<CategoryResponse> listCategories = pageCategories.getContent().stream()
                 .map(categoryMapper::toCategoryResponse).toList();

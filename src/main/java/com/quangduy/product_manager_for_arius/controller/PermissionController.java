@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +17,12 @@ import com.quangduy.product_manager_for_arius.dto.request.PermissionRequest;
 import com.quangduy.product_manager_for_arius.dto.request.RoleRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.PermissionResponse;
+import com.quangduy.product_manager_for_arius.entity.Permission;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.dto.response.PermissionResponse;
 import com.quangduy.product_manager_for_arius.service.PermissionService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -42,8 +46,9 @@ public class PermissionController {
 
     @GetMapping
     @ApiMessage("Get all permissions success")
-    ResponseEntity<ApiPagination<PermissionResponse>> getUsers(Pageable pageable) {
-        return ResponseEntity.ok().body(this.permissionService.getAll(pageable));
+    ResponseEntity<ApiPagination<PermissionResponse>> getUsers(@Filter Specification<Permission> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.permissionService.getAll(spec, pageable));
     }
 
     @GetMapping("/{id}")

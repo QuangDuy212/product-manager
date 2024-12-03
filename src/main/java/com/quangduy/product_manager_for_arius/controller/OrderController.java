@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +26,13 @@ import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.OrderResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.entity.Order;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.OrderService;
 import com.quangduy.product_manager_for_arius.service.export.OrderExcelExporter;
 import com.quangduy.product_manager_for_arius.service.export.UserExcelExporter;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -53,8 +57,8 @@ public class OrderController {
 
     @GetMapping
     @ApiMessage("Get all orders success")
-    ResponseEntity<ApiPagination<OrderResponse>> getAllEntities(Pageable pageable) {
-        return ResponseEntity.ok().body(this.orderService.getAllOrders(pageable));
+    ResponseEntity<ApiPagination<OrderResponse>> getAllEntities(@Filter Specification<Order> spec, Pageable pageable) {
+        return ResponseEntity.ok().body(this.orderService.getAllOrders(spec, pageable));
     }
 
     @GetMapping("/history")

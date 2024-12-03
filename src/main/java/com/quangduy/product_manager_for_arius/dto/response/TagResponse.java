@@ -1,5 +1,7 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
+import java.time.Instant;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -21,4 +23,8 @@ public class TagResponse {
     String id;
     String name;
     String description;
+    Instant createdAt;
+    Instant updatedAt;
+    String createdBy;
+    String updatedBy;
 }

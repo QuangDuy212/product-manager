@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.PermissionRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.PermissionResponse;
 import com.quangduy.product_manager_for_arius.entity.Permission;
+import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.PermissionMapper;
@@ -52,9 +54,9 @@ public class PermissionService {
         return this.permissionMapper.toPermissionResponse(entityDB);
     }
 
-    public ApiPagination<PermissionResponse> getAll(Pageable pageable) {
+    public ApiPagination<PermissionResponse> getAll(Specification<Permission> spec, Pageable pageable) {
         log.info("Get all permissions");
-        Page<Permission> page = this.permissionRepository.findAll(pageable);
+        Page<Permission> page = this.permissionRepository.findAll(spec, pageable);
 
         List<PermissionResponse> list = page.getContent().stream()
                 .map(permissionMapper::toPermissionResponse).toList();

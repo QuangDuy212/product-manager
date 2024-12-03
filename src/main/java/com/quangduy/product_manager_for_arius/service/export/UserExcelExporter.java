@@ -37,10 +37,9 @@ public class UserExcelExporter {
 
         createCell(row, 0, "User ID", style);
         createCell(row, 1, "Username", style);
-        createCell(row, 2, "First Name", style);
-        createCell(row, 3, "Last Name", style);
-        createCell(row, 4, "Roles", style);
-        createCell(row, 5, "Address", style);
+        createCell(row, 2, "Name", style);
+        createCell(row, 3, "Roles", style);
+        createCell(row, 4, "Address", style);
 
     }
 
@@ -71,8 +70,7 @@ public class UserExcelExporter {
 
             createCell(row, columnCount++, user.getId(), style);
             createCell(row, columnCount++, user.getUsername(), style);
-            createCell(row, columnCount++, user.getFirstName(), style);
-            createCell(row, columnCount++, user.getLastName(), style);
+            createCell(row, columnCount++, user.getName(), style);
             createCell(row, columnCount++, user.getRole(), style);
             createCell(row, columnCount++, user.getAddress(), style);
 

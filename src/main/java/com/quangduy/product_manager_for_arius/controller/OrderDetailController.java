@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +18,11 @@ import com.quangduy.product_manager_for_arius.dto.request.OrderDetailRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.OrderDetailResponse;
+import com.quangduy.product_manager_for_arius.entity.OrderDetail;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.OrderDetailService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -42,8 +46,9 @@ public class OrderDetailController {
 
     @GetMapping
     @ApiMessage("Get all orders detail success")
-    ResponseEntity<ApiPagination<OrderDetailResponse>> getAllEntities(Pageable pageable) {
-        return ResponseEntity.ok().body(this.orderDetailService.getAllOrders(pageable));
+    ResponseEntity<ApiPagination<OrderDetailResponse>> getAllEntities(@Filter Specification<OrderDetail> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.orderDetailService.getAllOrders(spec, pageable));
     }
 
     @GetMapping("/{id}")

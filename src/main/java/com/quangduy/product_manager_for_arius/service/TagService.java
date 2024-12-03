@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.TagRequest;
@@ -49,9 +50,9 @@ public class TagService {
         return this.tagMapper.toTagResponse(tagDB);
     }
 
-    public ApiPagination<TagResponse> getAllTags(Pageable pageable) {
+    public ApiPagination<TagResponse> getAllTags(Specification<Tag> spec, Pageable pageable) {
         log.info("Get all tags");
-        Page<Tag> page = this.tagRepository.findAll(pageable);
+        Page<Tag> page = this.tagRepository.findAll(spec, pageable);
 
         List<TagResponse> list = page.getContent().stream()
                 .map(tagMapper::toTagResponse).toList();

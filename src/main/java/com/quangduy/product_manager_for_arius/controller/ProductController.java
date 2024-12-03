@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +19,11 @@ import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.entity.Product;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.ProductService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -43,8 +47,9 @@ public class ProductController {
 
     @GetMapping
     @ApiMessage("Get all products success")
-    ResponseEntity<ApiPagination<ProductResponse>> getAllProducts(Pageable pageable) {
-        return ResponseEntity.ok().body(this.productService.getAllProducts(pageable));
+    ResponseEntity<ApiPagination<ProductResponse>> getAllProducts(@Filter Specification<Product> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.productService.getAllProducts(spec, pageable));
     }
 
     @GetMapping("/{id}")

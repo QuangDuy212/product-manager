@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,11 @@ import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
+import com.quangduy.product_manager_for_arius.entity.Category;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.CategoryService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -43,8 +47,9 @@ public class CategoryController {
 
     @GetMapping
     @ApiMessage("Get all categories success")
-    ResponseEntity<ApiPagination<CategoryResponse>> getAllCategories(Pageable pageable) {
-        return ResponseEntity.ok().body(this.categoryService.getAllCategories(pageable));
+    ResponseEntity<ApiPagination<CategoryResponse>> getAllCategories(@Filter Specification<Category> spec,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.categoryService.getAllCategories(spec, pageable));
     }
 
     @GetMapping("/{categoryId}")

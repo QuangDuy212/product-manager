@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.quangduy.product_manager_for_arius.dto.request.TagRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
-import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.TagResponse;
+import com.quangduy.product_manager_for_arius.entity.Tag;
 import com.quangduy.product_manager_for_arius.service.TagService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -41,8 +43,8 @@ public class TagController {
 
     @GetMapping
     @ApiMessage("Get all tags success")
-    ResponseEntity<ApiPagination<TagResponse>> getAllTags(Pageable pageable) {
-        return ResponseEntity.ok().body(this.tagService.getAllTags(pageable));
+    ResponseEntity<ApiPagination<TagResponse>> getAllTags(@Filter Specification<Tag> spec, Pageable pageable) {
+        return ResponseEntity.ok().body(this.tagService.getAllTags(spec, pageable));
     }
 
     @GetMapping("/{id}")

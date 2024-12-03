@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.OrderCreationRequest;
@@ -28,6 +29,7 @@ import com.quangduy.product_manager_for_arius.repository.OrderRepository;
 import com.quangduy.product_manager_for_arius.repository.ProductRepository;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
 import com.quangduy.product_manager_for_arius.util.SecurityUtil;
+import com.turkraft.springfilter.boot.Filter;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -91,9 +93,9 @@ public class OrderService {
                 return this.orderMapper.toOrderResponse(dataDB);
         }
 
-        public ApiPagination<OrderResponse> getAllOrders(Pageable pageable) {
+        public ApiPagination<OrderResponse> getAllOrders(@Filter Specification<Order> spec, Pageable pageable) {
                 log.info("Get all orders");
-                Page<Order> pageCategories = this.orderRepository.findAll(pageable);
+                Page<Order> pageCategories = this.orderRepository.findAll(spec, pageable);
 
                 List<OrderResponse> list = pageCategories.getContent().stream()
                                 .map(orderMapper::toOrderResponse).toList();

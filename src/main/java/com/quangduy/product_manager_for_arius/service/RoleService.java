@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.RoleRequest;
@@ -63,9 +64,9 @@ public class RoleService {
         return this.roleMapper.toRoleResponse(entityDB);
     }
 
-    public ApiPagination<RoleResponse> getAllRoles(Pageable pageable) {
+    public ApiPagination<RoleResponse> getAllRoles(Specification<Role> spec, Pageable pageable) {
         log.info("Get all roles");
-        Page<Role> page = this.roleRepository.findAll(pageable);
+        Page<Role> page = this.roleRepository.findAll(spec, pageable);
 
         List<RoleResponse> list = page.getContent().stream()
                 .map(roleMapper::toRoleResponse).toList();

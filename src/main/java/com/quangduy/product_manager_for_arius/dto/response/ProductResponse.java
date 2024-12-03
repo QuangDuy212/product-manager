@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
+import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,4 +28,8 @@ public class ProductResponse {
     String color;
     List<TagResponse> tags;
     CategoryResponse category;
+    Instant createdAt;
+    Instant updatedAt;
+    String createdBy;
+    String updatedBy;
 }

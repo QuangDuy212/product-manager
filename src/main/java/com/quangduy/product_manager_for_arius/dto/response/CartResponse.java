@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.dto.response;
 
+import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,4 +25,8 @@ public class CartResponse {
     String id;
     int sum;
     List<CartDetail> cartDetails;
+    Instant createdAt;
+    Instant updatedAt;
+    String createdBy;
+    String updatedBy;
 }

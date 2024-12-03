@@ -32,7 +32,7 @@ public class UserExcelImport {
   }
 
   public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  static String[] HEADERs = { "Username", "Password", "First Name", "Last Name", "Roles", "Address" };
+  static String[] HEADERs = { "Username", "Password", "Name", "Roles", "Address" };
   static String SHEET = "Users";
 
   public boolean hasExcelFormat(MultipartFile file) {
@@ -71,16 +71,13 @@ public class UserExcelImport {
               stu.setPassword(pass);
               break;
             case 2:
-              stu.setFirstName(currentCell.getStringCellValue());
+              stu.setName(currentCell.getStringCellValue());
               break;
             case 3:
-              stu.setLastName(currentCell.getStringCellValue());
-              break;
-            case 4:
               Role role = this.roleService.findByName(currentCell.getStringCellValue());
               stu.setRole(role);
               break;
-            case 5:
+            case 4:
               stu.setAddress(currentCell.getStringCellValue());
               break;
             default:

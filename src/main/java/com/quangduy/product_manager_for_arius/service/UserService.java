@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,9 +98,9 @@ public class UserService {
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
-    public ApiPagination<UserResponse> getAllUsers(Pageable pageable) {
+    public ApiPagination<UserResponse> getAllUsers(Specification<User> spec, Pageable pageable) {
         log.info("Get all users");
-        Page<User> pageUser = this.userRepository.findAll(pageable);
+        Page<User> pageUser = this.userRepository.findAll(spec, pageable);
 
         List<UserResponse> listUser = pageUser.getContent().stream().map(userMapper::toUserResponse).toList();
 

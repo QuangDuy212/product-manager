@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.dto.request.OrderDetailRequest;
@@ -64,9 +65,9 @@ public class OrderDetailService {
         return this.orderDetailMapper.toOrderDetailResponse(dataDB);
     }
 
-    public ApiPagination<OrderDetailResponse> getAllOrders(Pageable pageable) {
+    public ApiPagination<OrderDetailResponse> getAllOrders(Specification<OrderDetail> spec, Pageable pageable) {
         log.info("Get all order details");
-        Page<OrderDetail> pageCategories = this.orderDetailRepository.findAll(pageable);
+        Page<OrderDetail> pageCategories = this.orderDetailRepository.findAll(spec, pageable);
 
         List<OrderDetailResponse> list = pageCategories.getContent().stream()
                 .map(orderDetailMapper::toOrderDetailResponse).toList();

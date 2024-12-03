@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.quangduy.product_manager_for_arius.util.SecurityUtil;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,8 +34,7 @@ public class User {
     @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255)")
     String username;
     String password;
-    String firstName;
-    String lastName;
+    String name;
     String address;
 
     @OneToMany(mappedBy = "user")
@@ -44,5 +45,27 @@ public class User {
     Role role;
 
     @OneToOne(mappedBy = "user")
-    private Cart cart;
+    Cart cart;
+
+    Instant createdAt;
+    Instant updatedAt;
+    String createdBy;
+    String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        this.createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        this.updatedAt = Instant.now();
+    }
+
 }

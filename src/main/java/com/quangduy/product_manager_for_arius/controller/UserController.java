@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +26,12 @@ import com.quangduy.product_manager_for_arius.dto.request.UserUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.UserService;
 import com.quangduy.product_manager_for_arius.service.export.UserExcelExporter;
 import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -54,8 +57,8 @@ public class UserController {
 
     @GetMapping
     @ApiMessage("Get all users success")
-    ResponseEntity<ApiPagination<UserResponse>> getUsers(Pageable pageable) {
-        return ResponseEntity.ok().body(this.userService.getAllUsers(pageable));
+    ResponseEntity<ApiPagination<UserResponse>> getUsers(@Filter Specification<User> spec, Pageable pageable) {
+        return ResponseEntity.ok().body(this.userService.getAllUsers(spec, pageable));
     }
 
     @GetMapping("/{id}")
