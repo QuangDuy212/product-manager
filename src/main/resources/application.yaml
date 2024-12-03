@@ -3,6 +3,10 @@ server:
   servlet:
     context-path: /api/v1
 spring:
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
   servlet:
     multipart:
       max-file-size: 50MB
@@ -27,7 +31,8 @@ spring:
       platform: postgres
 quangduy:
   jwt:
-    base64-secret: qoAEABDke07+AVLepXB4aCMtsT0wMAqR5x2VFyldsnx6e75YQkJH2UcZKTjEyoNgG71SBCXfq5N6NVZxWOfsHQ==
+    base64-secret-access: qoAEABDke07+AVLepXB4aCMtsT0wMAqR5x2VFyldsnx6e75YQkJH2UcZKTjEyoNgG71SBCXfq5N6NVZxWOfsHQ==
+    base64-secret-fresh: cmVmZXJ3aXJldHJpY2thY3R1YWxvcmdhbml6YXRpb25lc2NhcGVkZXNrc3RvcHBlZGU=
     access-token-validity-in-seconds: 8640000
     refresh-token-validity-in-seconds: 8640000
 aws:
@@ -36,3 +41,7 @@ aws:
   s3:
     bucketName: ${ARIUS_BUCKETNAME}
     region: us-east-2
+elasticsearch:
+  username: elastic
+  password: lyUQxxheK-0QGg6LtDwG
+  node: localhost:9200

@@ -37,7 +37,7 @@ public class SecurityUtil {
     @NonFinal
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
-    @Value("${quangduy.jwt.base64-secret}")
+    @Value("${quangduy.jwt.base64-secret-access}")
     @NonFinal
     private String jwtKey;
 

@@ -31,6 +31,7 @@ import com.quangduy.product_manager_for_arius.service.UserService;
 import com.quangduy.product_manager_for_arius.service.export.UserExcelExporter;
 import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
+import com.quangduy.product_manager_for_arius.util.annotation.PublicEndpoint;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,6 +50,7 @@ public class UserController {
     UserService userService;
     UserExcelImport userExcelImport;
 
+    @PublicEndpoint
     @PostMapping
     @ApiMessage("Create a user success")
     ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
