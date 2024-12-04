@@ -15,6 +15,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ESCategory {
     @Id
-    String id;
     String name;
 }

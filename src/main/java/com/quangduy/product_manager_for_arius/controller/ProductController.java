@@ -1,5 +1,7 @@
 package com.quangduy.product_manager_for_arius.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,11 @@ import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.dto.response.es.ESProductResponse;
 import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.ProductService;
+import com.quangduy.product_manager_for_arius.service.es.ESProductService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 import com.turkraft.springfilter.boot.Filter;
 
@@ -38,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductController {
     ProductService productService;
+    ESProductService esProductService;
 
     @PostMapping
     @ApiMessage("Create a product success")
@@ -77,5 +82,11 @@ public class ProductController {
     @ApiMessage("Import data success")
     public ResponseEntity<?> importData(@RequestParam("file") MultipartFile file) {
         return this.productService.importData(file);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiPagination<ESProductResponse>> searchProductByName(@RequestParam String query,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.esProductService.searchByName(query, pageable));
     }
 }

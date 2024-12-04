@@ -8,6 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
+import com.quangduy.product_manager_for_arius.dto.response.es.ESProductResponse;
 import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.es.ESProduct;
 
@@ -24,4 +25,5 @@ public interface ProductMapper {
 
     ESProduct toESProduct(Product product);
 
+    ESProductResponse toESProductResponse(ESProduct product);
 }

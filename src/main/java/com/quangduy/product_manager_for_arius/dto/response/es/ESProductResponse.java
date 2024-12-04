@@ -30,5 +30,5 @@ public class ESProductResponse {
     double price;
     String color;
     ESCategory category;
-    Set<ESTag> tags;
+    List<ESTag> tags;
 }
