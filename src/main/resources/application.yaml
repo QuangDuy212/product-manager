@@ -3,6 +3,10 @@ server:
   servlet:
     context-path: /api/v1
 spring:
+  redis:
+    data:
+      host: localhost
+      port: 6379
   elasticsearch:
     username: elastic
     password: lyUQxxheK-0QGg6LtDwG

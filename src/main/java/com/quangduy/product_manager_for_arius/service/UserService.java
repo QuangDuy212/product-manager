@@ -55,7 +55,7 @@ public class UserService {
             Role role = this.roleService.findByName(PredefinedRole.USER_ROLE);
             user.setRole(role);
         } else {
-            Role role = this.roleService.findByName(request.getRole());
+            Role role = this.roleService.findById(request.getRole());
             user.setRole(role);
         }
 
@@ -77,27 +77,32 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse update(String userId, UserUpdateRequest request) {
         log.info("Update a user");
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (request.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         if (request.getRole() != null) {
-            Role role = this.roleService.findByName(request.getRole());
+            Role role = this.roleService.findById(request.getRole());
             user.setRole(role);
+        }
+        if (request.getUsername() != null && request.getUsername() != user.getUsername()) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new AppException(ErrorCode.USERNAME_INVALID);
+            }
+            user.setUsername(request.getUsername());
         }
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     public void delete(String userId) {
         log.info("Delete a user");
         userRepository.deleteById(userId);
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     public ApiPagination<UserResponse> getAllUsers(Specification<User> spec, Pageable pageable) {
         log.info("Get all users");
         Page<User> pageUser = this.userRepository.findAll(spec, pageable);
@@ -125,7 +130,6 @@ public class UserService {
         return res;
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getDetailUser(String id) {
         log.info("Get detail a user");
         return userMapper.toUserResponse(

@@ -36,7 +36,6 @@
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
 	</properties>
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/com.turkraft.springfilter/jpa -->
 		<dependency>
 			<groupId>com.turkraft.springfilter</groupId>
 			<artifactId>jpa</artifactId>
@@ -44,13 +43,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>co.elastic.clients</groupId>
-			<artifactId>elasticsearch-java</artifactId>
-			<version>8.10.2</version>			<!-- Phiên bản Elasticsearch 8.x -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
 		</dependency>
 
 		<dependency>

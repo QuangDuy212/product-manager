@@ -97,4 +97,10 @@ public class RoleService {
         return this.roleRepository.findByName(name)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
     }
+
+    public Role findById(String id) {
+        return this.roleRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+
+    }
 }

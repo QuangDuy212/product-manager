@@ -7,11 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.dto.response.es.ESProductResponse;
@@ -32,8 +35,9 @@ public class ESProductService {
         return this.productMapper.toESProductResponse(this.esProductRepository.save(request));
     }
 
+    @Cacheable(value = "searchProducts", key = "#query + #pageable")
     public ApiPagination<ESProductResponse> searchByName(String query, Pageable pageable) {
-
+        ObjectMapper mapper = new ObjectMapper();
         Page<ESProduct> page = this.esProductRepository.searchByQuery(query, pageable);
 
         List<ESProductResponse> list = page.getContent().stream().map(productMapper::toESProductResponse).toList();
@@ -45,10 +49,13 @@ public class ESProductService {
 
         mt.setPages(page.getTotalPages());
         mt.setTotal(page.getTotalElements());
-
-        return ApiPagination.<ESProductResponse>builder()
+        ApiPagination<ESProductResponse> vip = ApiPagination.<ESProductResponse>builder()
                 .meta(mt)
                 .result(list)
                 .build();
+
+        return mapper.convertValue(vip,
+                new TypeReference<ApiPagination<ESProductResponse>>() {
+                });
     }
 }
