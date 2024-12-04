@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.quangduy.product_manager_for_arius.dto.request.RoleRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.RoleResponse;
 import com.quangduy.product_manager_for_arius.entity.Role;
 import com.quangduy.product_manager_for_arius.entity.User;
@@ -56,8 +57,11 @@ public class RoleController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a role success")
-    ResponseEntity<String> delete(@PathVariable String id) {
-        return ResponseEntity.ok().body(roleService.delete(id));
+    ResponseEntity<ApiString> delete(@PathVariable String id) {
+        roleService.delete(id);
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @PutMapping("/{id}")

@@ -17,6 +17,7 @@ import com.amazonaws.Response;
 import com.quangduy.product_manager_for_arius.dto.request.OrderDetailRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.OrderDetailResponse;
 import com.quangduy.product_manager_for_arius.entity.OrderDetail;
 import com.quangduy.product_manager_for_arius.entity.User;
@@ -67,8 +68,10 @@ public class OrderDetailController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a order detail success")
-    ResponseEntity<String> delete(@PathVariable("id") String id) {
+    ResponseEntity<ApiString> delete(@PathVariable("id") String id) {
         this.orderDetailService.delete(id);
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 }

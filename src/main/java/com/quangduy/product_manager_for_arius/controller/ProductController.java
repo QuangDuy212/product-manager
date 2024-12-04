@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
 import com.quangduy.product_manager_for_arius.dto.response.es.ESProductResponse;
 import com.quangduy.product_manager_for_arius.entity.Product;
@@ -73,9 +74,11 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a product success")
-    ResponseEntity<String> delete(@PathVariable("id") String id) {
+    ResponseEntity<ApiString> delete(@PathVariable("id") String id) {
         this.productService.delete(id);
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @PostMapping("/excel/import")

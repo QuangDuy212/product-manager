@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.quangduy.product_manager_for_arius.dto.request.PermissionRequest;
 import com.quangduy.product_manager_for_arius.dto.request.RoleRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.PermissionResponse;
 import com.quangduy.product_manager_for_arius.entity.Permission;
 import com.quangduy.product_manager_for_arius.entity.User;
@@ -59,9 +60,11 @@ public class PermissionController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a permission success")
-    ResponseEntity<String> delete(@PathVariable String id) {
+    ResponseEntity<ApiString> delete(@PathVariable String id) {
         permissionService.delete(id);
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @PutMapping("/{id}")

@@ -25,6 +25,7 @@ import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.UserUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.service.UserService;
@@ -77,9 +78,11 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a user success")
-    ResponseEntity<String> delete(@PathVariable String id) {
+    ResponseEntity<ApiString> delete(@PathVariable String id) {
         userService.delete(id);
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @PutMapping("/{id}")
@@ -90,7 +93,7 @@ public class UserController {
 
     @GetMapping("/excel/export")
     @ApiMessage("Export all users success")
-    public ResponseEntity<String> exportToExcel(HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiString> exportToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
@@ -105,7 +108,9 @@ public class UserController {
 
         excelExporter.export(response);
 
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @PostMapping("/excel/import")

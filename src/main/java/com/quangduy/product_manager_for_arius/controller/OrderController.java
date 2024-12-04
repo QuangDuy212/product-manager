@@ -24,6 +24,7 @@ import com.quangduy.product_manager_for_arius.dto.request.OrderRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.OrderResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.Order;
@@ -83,9 +84,11 @@ public class OrderController {
 
     @DeleteMapping("/{id}")
     @ApiMessage("Delete a order success")
-    ResponseEntity<String> delete(@PathVariable("id") String id) {
+    ResponseEntity<ApiString> delete(@PathVariable("id") String id) {
         this.orderService.delete(id);
-        return ResponseEntity.ok().body("ok");
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
 
     }
 

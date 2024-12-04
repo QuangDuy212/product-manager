@@ -18,6 +18,7 @@ import com.amazonaws.Response;
 import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
+import com.quangduy.product_manager_for_arius.dto.response.ApiString;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
 import com.quangduy.product_manager_for_arius.entity.User;
@@ -52,24 +53,26 @@ public class CategoryController {
         return ResponseEntity.ok().body(this.categoryService.getAllCategories(spec, pageable));
     }
 
-    @GetMapping("/{categoryId}")
+    @GetMapping("/{id}")
     @ApiMessage("Get detail category success")
     ResponseEntity<CategoryResponse> getDetailCategory(
-            @PathVariable("categoryId") String categoryId) {
-        return ResponseEntity.ok().body(this.categoryService.getDetailCategory(categoryId));
+            @PathVariable("id") String id) {
+        return ResponseEntity.ok().body(this.categoryService.getDetailCategory(id));
     }
 
-    @PutMapping("/{categoryId}")
+    @PutMapping("/{id}")
     @ApiMessage("Update a category success")
-    ResponseEntity<CategoryResponse> update(@PathVariable("categoryId") String categoryId,
+    ResponseEntity<CategoryResponse> update(@PathVariable("id") String id,
             @RequestBody @Valid CategoryRequest request) {
-        return ResponseEntity.ok().body(this.categoryService.update(categoryId, request));
+        return ResponseEntity.ok().body(this.categoryService.update(id, request));
     }
 
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("/{id}")
     @ApiMessage("Delete a category success")
-    ResponseEntity<String> delete(@PathVariable("categoryId") String categoryId) {
-        this.categoryService.delete(categoryId);
-        return ResponseEntity.ok().body(null);
+    ResponseEntity<ApiString> delete(@PathVariable("id") String id) {
+        this.categoryService.delete(id);
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 }
