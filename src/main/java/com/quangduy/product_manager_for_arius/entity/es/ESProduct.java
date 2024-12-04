@@ -25,5 +25,5 @@ public class ESProduct {
     double price;
     String color;
     ESCategory category;
-    Set<ESTag> tags;
+    List<ESTag> tags;
 }

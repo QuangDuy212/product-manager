@@ -8,6 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.quangduy.product_manager_for_arius.dto.request.TagRequest;
 import com.quangduy.product_manager_for_arius.dto.response.TagResponse;
 import com.quangduy.product_manager_for_arius.entity.Tag;
+import com.quangduy.product_manager_for_arius.entity.es.ESTag;
 
 @Mapper(componentModel = "spring")
 public interface TagMapper {
@@ -17,4 +18,6 @@ public interface TagMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateTag(@MappingTarget Tag tag, TagRequest request);
+
+    ESTag toESTag(Tag tag);
 }

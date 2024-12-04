@@ -62,7 +62,7 @@ public class AuthenticationService {
     @NonFinal
     long refreshTokenExpiration;
 
-    @Value("${quangduy.jwt.base64-secret}")
+    @Value("${quangduy.jwt.base64-secret-access}")
     @NonFinal
     String SIGNER_KEY;
 

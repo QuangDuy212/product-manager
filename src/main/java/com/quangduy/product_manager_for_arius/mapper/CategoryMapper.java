@@ -8,6 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
+import com.quangduy.product_manager_for_arius.entity.es.ESCategory;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
@@ -17,4 +18,6 @@ public interface CategoryMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateCategory(@MappingTarget Category category, CategoryRequest request);
+
+    ESCategory toESCategory(Category category);
 }

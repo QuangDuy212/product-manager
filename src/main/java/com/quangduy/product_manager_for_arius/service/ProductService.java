@@ -22,6 +22,7 @@ import com.quangduy.product_manager_for_arius.entity.Category;
 import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.Tag;
 import com.quangduy.product_manager_for_arius.entity.User;
+import com.quangduy.product_manager_for_arius.entity.es.ESProduct;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.CategoryMapper;
@@ -30,6 +31,7 @@ import com.quangduy.product_manager_for_arius.mapper.TagMapper;
 import com.quangduy.product_manager_for_arius.repository.CategoryRepository;
 import com.quangduy.product_manager_for_arius.repository.ProductRepository;
 import com.quangduy.product_manager_for_arius.repository.TagRepository;
+import com.quangduy.product_manager_for_arius.repository.es.ESProductRepository;
 import com.quangduy.product_manager_for_arius.service.importfile.ProductExcelImport;
 
 import lombok.AccessLevel;
@@ -49,6 +51,14 @@ public class ProductService {
     TagMapper tagMapper;
     CategoryMapper categoryMapper;
     ProductExcelImport productExcelImport;
+    ESProductRepository esProductRepository;
+
+    public ESProduct convertProductToESProduct(Product product) {
+        ESProduct esproduct = productMapper.toESProduct(product);
+        esproduct.setCategory(categoryMapper.toESCategory(product.getCategory()));
+        esproduct.setTags(product.getTags().stream().map(tagMapper::toESTag).toList());
+        return esproduct;
+    }
 
     public ProductResponse create(ProductCreationRequest request) {
         log.info("Create a product");
@@ -62,7 +72,13 @@ public class ProductService {
             List<Tag> tags = this.tagRepository.findByIdIn(request.getTagsId());
             product.setTags(tags);
         }
-        ProductResponse res = this.productMapper.toProductResponse(this.productRepository.save(product));
+        product = this.productRepository.save(product);
+
+        // save in elasticsearch
+        ESProduct esproduct = convertProductToESProduct(product);
+        this.esProductRepository.save(esproduct);
+
+        ProductResponse res = this.productMapper.toProductResponse(product);
         if (product.getCategory() != null) {
             res.setCategory(this.categoryMapper.toCategoryResponse(product.getCategory()));
         }
@@ -85,7 +101,10 @@ public class ProductService {
             List<Tag> tags = this.tagRepository.findByIdIn(request.getTagsId());
             productDB.setTags(tags);
         }
-        ProductResponse res = this.productMapper.toProductResponse(this.productRepository.save(productDB));
+        productDB = this.productRepository.save(productDB);
+        ESProduct product = convertProductToESProduct(productDB);
+        esProductRepository.save(product);
+        ProductResponse res = this.productMapper.toProductResponse(productDB);
         if (productDB.getCategory() != null) {
             res.setCategory(this.categoryMapper.toCategoryResponse(productDB.getCategory()));
         }
@@ -130,6 +149,7 @@ public class ProductService {
 
     public void delete(String productId) {
         log.info("Delete a product");
+        esProductRepository.deleteById(productId);
         this.productRepository.deleteById(productId);
     }
 
@@ -142,6 +162,8 @@ public class ProductService {
             throw new RuntimeException("Excel data is failed to store: " + ex.getMessage());
         }
         List<ProductResponse> res = entites.stream().map(productMapper::toProductResponse).toList();
+        List<ESProduct> listEsProduct = entites.stream().map(productMapper::toESProduct).toList();
+        esProductRepository.saveAll(listEsProduct);
         return res;
     }
 

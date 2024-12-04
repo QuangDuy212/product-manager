@@ -3,6 +3,10 @@ server:
   servlet:
     context-path: /api/v1
 spring:
+  elasticsearch:
+    username: elastic
+    password: lyUQxxheK-0QGg6LtDwG
+    uris: http://localhost:9200
   data:
     web:
       pageable:
@@ -41,7 +45,3 @@ aws:
   s3:
     bucketName: ${ARIUS_BUCKETNAME}
     region: us-east-2
-elasticsearch:
-  username: elastic
-  password: lyUQxxheK-0QGg6LtDwG
-  node: localhost:9200

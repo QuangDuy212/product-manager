@@ -9,6 +9,7 @@ import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
 import com.quangduy.product_manager_for_arius.entity.Product;
+import com.quangduy.product_manager_for_arius.entity.es.ESProduct;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
@@ -20,4 +21,7 @@ public interface ProductMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateProduct(@MappingTarget Product product, ProductUpdateRequest request);
+
+    ESProduct toESProduct(Product product);
+
 }

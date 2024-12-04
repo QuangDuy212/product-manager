@@ -20,7 +20,7 @@ import com.quangduy.product_manager_for_arius.util.SecurityUtil;
 @Configuration
 public class SecurityJwtConfiguration {
 
-    @Value("${quangduy.jwt.base64-secret}")
+    @Value("${quangduy.jwt.base64-secret-access}")
     private String jwtKey;
 
     private SecretKey getSecretKey() {
