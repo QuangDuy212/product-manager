@@ -49,7 +49,7 @@ public class UserService {
         log.info("Create a user");
         User user = this.userMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
-
+        user.setActive(true);
         if (request.getRole() == null) {
             request.setRole(PredefinedRole.USER_ROLE);
             Role role = this.roleService.findByName(PredefinedRole.USER_ROLE);
@@ -95,12 +95,18 @@ public class UserService {
             }
             user.setUsername(request.getUsername());
         }
+        if (request.isActive()) {
+            user.setActive(true);
+        }
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
     public void delete(String userId) {
         log.info("Delete a user");
-        userRepository.deleteById(userId);
+        User user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(false);
+        this.userRepository.save(user);
     }
 
     public ApiPagination<UserResponse> getAllUsers(Specification<User> spec, Pageable pageable) {

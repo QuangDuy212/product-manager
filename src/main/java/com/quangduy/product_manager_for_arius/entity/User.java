@@ -36,6 +36,7 @@ public class User {
     String password;
     String name;
     String address;
+    boolean active;
 
     @OneToMany(mappedBy = "user")
     List<Order> orders;

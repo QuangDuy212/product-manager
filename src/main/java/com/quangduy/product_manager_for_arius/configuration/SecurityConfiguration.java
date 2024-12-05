@@ -24,7 +24,7 @@ public class SecurityConfiguration {
 
                 String[] whileList = {
                                 "/", "/auth/login", "/auth/refresh", "/auth/register",
-                                "/roles/**",
+                                "/roles/**", "/users/excel/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
                 };
                 http

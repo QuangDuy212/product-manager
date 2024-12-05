@@ -95,6 +95,9 @@ public class AuthenticationService {
         AuthenticationResponse res = new AuthenticationResponse();
         User currentUserDB = this.userService.handleGetUserByUsername(request.getUsername());
         if (currentUserDB != null) {
+            if (currentUserDB.isActive() != true) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
             res.setUser(this.authMapper.toUserResponse(currentUserDB));
         }
         // create a token

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,9 +92,10 @@ public class UserController {
         return ResponseEntity.ok().body(this.userService.update(id, request));
     }
 
+    @CrossOrigin(origins = "*", exposedHeaders = "Content-Disposition")
     @GetMapping("/excel/export")
     @ApiMessage("Export all users success")
-    public ResponseEntity<ApiString> exportToExcel(HttpServletResponse response) throws IOException {
+    public void exportToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
@@ -107,10 +109,6 @@ public class UserController {
         UserExcelExporter excelExporter = new UserExcelExporter(listUsers);
 
         excelExporter.export(response);
-
-        return ResponseEntity.ok().body(ApiString.builder()
-                .message("success")
-                .build());
     }
 
     @PostMapping("/excel/import")

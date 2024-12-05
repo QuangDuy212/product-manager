@@ -48,10 +48,12 @@ public class UserExcelExporter {
         Cell cell = row.createCell(columnCount);
         if (value instanceof Integer) {
             cell.setCellValue((Integer) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        } else {
+        } else if (value instanceof Long) {
+            cell.setCellValue((Long) value);
+        } else if (value instanceof String) {
             cell.setCellValue((String) value);
+        } else {
+            cell.setCellValue((Boolean) value);
         }
         cell.setCellStyle(style);
     }
@@ -63,7 +65,7 @@ public class UserExcelExporter {
         XSSFFont font = workbook.createFont();
         font.setFontHeight(14);
         style.setFont(font);
-
+        var list = listUsers;
         for (UserResponse user : listUsers) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
@@ -71,7 +73,7 @@ public class UserExcelExporter {
             createCell(row, columnCount++, user.getId(), style);
             createCell(row, columnCount++, user.getUsername(), style);
             createCell(row, columnCount++, user.getName(), style);
-            createCell(row, columnCount++, user.getRole(), style);
+            createCell(row, columnCount++, user.getRole().getName(), style);
             createCell(row, columnCount++, user.getAddress(), style);
 
         }
