@@ -23,9 +23,11 @@ public class ProductResponse {
     String id;
     String name;
     String thumbnail;
+    long quantity;
+    double discount;
     List<String> sliders;
     double price;
-    String color;
+    String shortDes;
     List<TagResponse> tags;
     CategoryResponse category;
     Instant createdAt;

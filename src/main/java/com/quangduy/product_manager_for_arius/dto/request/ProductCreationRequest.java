@@ -23,10 +23,14 @@ public class ProductCreationRequest {
     @NotBlank(message = "INVALID_THUMBNAIL_PRODUCT")
     String thumbnail;
     List<String> sliders;
+    @Min(value = 0, message = "INVALID_QUANTITY_PRODUCT")
+    long quantity;
+    @Min(value = 0, message = "INVALID_DISCOUNT_PRODUCT")
+    double discount;
     @Min(value = 0, message = "INVALID_PRICE_PRODUCT")
     double price;
     @NotBlank(message = "INVALID_COLOR_PRODUCT")
-    String color;
+    String shortDes;
     String categoryId;
     List<String> tagsId;
 }

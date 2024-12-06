@@ -43,32 +43,32 @@ public class DatabaseInitializer implements CommandLineRunner {
             arr.add(new Permission("Create a product", "/api/v1/products", "POST", "PRODUCTS", true));
             arr.add(new Permission("Import product from excel", "/api/v1/products/excel/import", "POST", "PRODUCTS",
                     true));
-            arr.add(new Permission("Update a product", "/api/v1/products", "PUT", "PRODUCTS", true));
+            arr.add(new Permission("Update a product", "/api/v1/products/{id}", "PUT", "PRODUCTS", true));
             arr.add(new Permission("Delete a product", "/api/v1/products/{id}", "DELETE", "PRODUCTS", true));
             arr.add(new Permission("Get a product by id", "/api/v1/products/{id}", "GET", "PRODUCTS", true));
             arr.add(new Permission("Get products with pagination", "/api/v1/products", "GET", "PRODUCTS", true));
 
             arr.add(new Permission("Create a category", "/api/v1/categories", "POST", "CATEGORIES", true));
-            arr.add(new Permission("Update a category", "/api/v1/categories", "PUT", "CATEGORIES", true));
+            arr.add(new Permission("Update a category", "/api/v1/categories/{id}", "PUT", "CATEGORIES", true));
             arr.add(new Permission("Delete a category", "/api/v1/categories/{id}", "DELETE", "CATEGORIES", true));
             arr.add(new Permission("Get a category by id", "/api/v1/categories/{id}", "GET", "CATEGORIES", true));
             arr.add(new Permission("Get categories with pagination", "/api/v1/categories", "GET", "CATEGORIES", true));
 
             arr.add(new Permission("Create a permission", "/api/v1/permissions", "POST", "PERMISSIONS", true));
-            arr.add(new Permission("Update a permission", "/api/v1/permissions", "PUT", "PERMISSIONS", true));
+            arr.add(new Permission("Update a permission", "/api/v1/permissions/{id}", "PUT", "PERMISSIONS", true));
             arr.add(new Permission("Delete a permission", "/api/v1/permissions/{id}", "DELETE", "PERMISSIONS", true));
             arr.add(new Permission("Get a permission by id", "/api/v1/permissions/{id}", "GET", "PERMISSIONS", true));
             arr.add(new Permission("Get permissions with pagination", "/api/v1/permissions", "GET", "PERMISSIONS",
                     true));
 
             arr.add(new Permission("Create a tag", "/api/v1/tags", "POST", "TAGS", true));
-            arr.add(new Permission("Update a tag", "/api/v1/tags", "PUT", "TAGS", true));
+            arr.add(new Permission("Update a tag", "/api/v1/tags/{id}", "PUT", "TAGS", true));
             arr.add(new Permission("Delete a tag", "/api/v1/tags/{id}", "DELETE", "TAGS", true));
             arr.add(new Permission("Get a tag by id", "/api/v1/tags/{id}", "GET", "TAGS", true));
             arr.add(new Permission("Get tags with pagination", "/api/v1/tags", "GET", "TAGS", true));
 
             arr.add(new Permission("Create a role", "/api/v1/roles", "POST", "ROLES", true));
-            arr.add(new Permission("Update a role", "/api/v1/roles", "PUT", "ROLES", true));
+            arr.add(new Permission("Update a role", "/api/v1/roles/{id}", "PUT", "ROLES", true));
             arr.add(new Permission("Delete a role", "/api/v1/roles/{id}", "DELETE", "ROLES", true));
             arr.add(new Permission("Get a role by id", "/api/v1/roles/{id}", "GET", "ROLES", true));
             arr.add(new Permission("Get roles with pagination", "/api/v1/roles", "GET", "ROLES", true));
@@ -83,12 +83,12 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             arr.add(new Permission("Create a order", "/api/v1/orders", "POST", "ORDERS", true));
             arr.add(new Permission("Export order", "/api/v1/orders/excel/export", "GET", "ORDERS", true));
-            arr.add(new Permission("Update a order", "/api/v1/orders", "PUT", "ORDERS", true));
+            arr.add(new Permission("Update a order", "/api/v1/orders/{id}", "PUT", "ORDERS", true));
             arr.add(new Permission("Delete a order", "/api/v1/orders/{id}", "DELETE", "ORDERS", true));
             arr.add(new Permission("Get a order by id", "/api/v1/orders/{id}", "GET", "ORDERS", true));
             arr.add(new Permission("Get orders with pagination", "/api/v1/orders", "GET", "ORDERS", true));
 
-            arr.add(new Permission("Upload a file", "/api/v1/files/upload", "POST", "FILES", true));
+            arr.add(new Permission("Upload a file", "/api/v1/file/upload", "POST", "FILES", true));
 
             this.permissionRepository.saveAll(arr);
         }

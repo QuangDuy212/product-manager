@@ -24,6 +24,7 @@ public class RoleResponse {
     @JsonProperty("_id")
     String id;
     String name;
+    boolean active;
     String description;
     List<Permission> permissions;
     Instant createdAt;

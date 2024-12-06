@@ -12,9 +12,6 @@ import com.quangduy.product_manager_for_arius.entity.es.ESProduct;
 
 @Repository
 public interface ESProductRepository extends ElasticsearchRepository<ESProduct, String> {
-    // @Query("{\"match\": {\"name\": {\"query\": \"?0\"}}}")
-    // Page<ESProduct> findByName(String name, Pageable pageable);
-
-    @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"name^3\", \"color\", \"tags.name\", \"category.name\"], \"fuzziness\": \"AUTO\"}}")
+    @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"name^3\", \"shortDes\", \"tags.name\", \"category.name\"], \"fuzziness\": \"AUTO\"}}")
     Page<ESProduct> searchByQuery(String query, Pageable pageable);
 }

@@ -36,14 +36,13 @@ public class ProductExcelImport {
     @NonFinal
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     @NonFinal
-    static String[] HEADERs = { "Name", "Thumbnail", "Sliders", "Price", "Price", "Color", "Category", "Tags" };
+    static String[] HEADERs = { "Name", "Thumbnail", "Sliders", "Price", "Price", "ShortDes", "Category", "Tags" };
     @NonFinal
     static String SHEET = "Products";
     @NonFinal
     static String DIRECTORY = "D:/Workspace/project/images";
 
     public boolean hasExcelFormat(MultipartFile file) {
-        var test = file.getContentType();
         if (!TYPE.equals(file.getContentType())) {
             return false;
         }
@@ -133,7 +132,7 @@ public class ProductExcelImport {
                             stu.setPrice(currentCell.getNumericCellValue());
                             break;
                         case 4:
-                            stu.setColor(currentCell.getStringCellValue());
+                            stu.setShortDes(currentCell.getStringCellValue());
                             break;
                         case 5:
                             String category = currentCell.getStringCellValue();

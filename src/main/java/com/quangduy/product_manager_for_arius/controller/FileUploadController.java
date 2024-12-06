@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
+import com.quangduy.product_manager_for_arius.dto.response.ApiUpload;
 import com.quangduy.product_manager_for_arius.service.S3FileUploadService;
 import com.quangduy.product_manager_for_arius.util.annotation.ApiMessage;
 
@@ -26,7 +27,7 @@ public class FileUploadController {
 
     @PostMapping("/upload")
     @ApiMessage("Upload file success")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiUpload> uploadFile(@RequestParam("file") MultipartFile file,
             @RequestParam("folder") String folder)
             throws IOException {
         return ResponseEntity.ok().body(fileUploadService.uploadFile(file, "quangduy/" + folder));

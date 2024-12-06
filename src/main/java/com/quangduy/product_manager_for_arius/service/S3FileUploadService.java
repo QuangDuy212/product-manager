@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.quangduy.product_manager_for_arius.dto.response.ApiUpload;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class S3FileUploadService {
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    public String uploadFile(MultipartFile file, String folder) {
+    public ApiUpload uploadFile(MultipartFile file, String folder) {
         File localFile = null;
         String fileName = folder + "/" + file.getOriginalFilename();
         localFile = this.convertMultiPartToFile(file);
@@ -40,7 +42,9 @@ public class S3FileUploadService {
             localFile.delete();
         }
         String fileUrl = this.amazonS3.getUrl(bucketName, fileName).toString();
-        return fileUrl;
+        return ApiUpload.builder()
+                .fileName(fileUrl)
+                .build();
     }
 
     public String uploadFile(File file, String folder, String fileName) {

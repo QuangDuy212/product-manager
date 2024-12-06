@@ -32,7 +32,8 @@ public class Product {
     String thumbnail;
     List<String> sliders;
     double price;
-    String color;
+    long quantity;
+    double discount;
     @ManyToOne
     @JoinColumn(name = "category_name", nullable = true)
     Category category;
