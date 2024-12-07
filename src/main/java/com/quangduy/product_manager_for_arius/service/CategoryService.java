@@ -11,6 +11,7 @@ import com.quangduy.product_manager_for_arius.dto.request.CategoryRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.CategoryResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
+import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.CategoryMapper;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
+    ProductService productService;
 
     public CategoryResponse create(CategoryRequest request) {
         log.info("Create a category");
@@ -43,8 +45,15 @@ public class CategoryService {
             throw new AppException(ErrorCode.CATEGORY_EXISTED);
         Category categoryDB = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        this.categoryMapper.updateCategory(categoryDB, request);
-        return this.categoryMapper.toCategoryResponse(this.categoryRepository.save(categoryDB));
+        String oldName = categoryDB.getName();
+        categoryDB.setName(request.getName());
+        List<Product> products = categoryDB.getProducts();
+        for (Product product : products) {
+            product.setCategory(categoryDB);
+            this.productService.save(product); // Cập nhật sản phẩm
+        }
+        this.categoryRepository.save(categoryDB);
+        return this.categoryMapper.toCategoryResponse(categoryDB);
     }
 
     public CategoryResponse getDetailCategory(String categoryId) {
@@ -77,6 +86,10 @@ public class CategoryService {
 
     public void delete(String categoryId) {
         log.info("Delete a category");
+        Category cate = this.categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        List<Product> product = cate.getProducts();
+        this.productService.deleteAll(product);
         this.categoryRepository.deleteById(categoryId);
     }
 }

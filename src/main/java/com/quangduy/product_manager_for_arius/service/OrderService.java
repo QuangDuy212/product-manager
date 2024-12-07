@@ -156,6 +156,11 @@ public class OrderService {
 
         public void delete(String id) {
                 log.info("Delete a order");
+                Order order = this.orderRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+                List<OrderDetail> a = order.getOrderDetails();
+                this.orderDetailRepository.deleteAll(a);
                 this.orderRepository.deleteById(id);
         }
 

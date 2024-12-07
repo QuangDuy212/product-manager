@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.entity;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,11 +22,15 @@ import lombok.experimental.FieldDefaults;
 @JsonPropertyOrder(alphabetic = true)
 public class Category {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonProperty("_id")
+    String id;
+
     @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255)")
     String name;
 
     @OneToMany(mappedBy = "category")
-    Set<Product> products;
+    List<Product> products;
 
     Instant createdAt;
     Instant updatedAt;

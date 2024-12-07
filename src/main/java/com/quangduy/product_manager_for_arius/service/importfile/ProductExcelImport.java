@@ -21,8 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.quangduy.product_manager_for_arius.entity.Category;
 import com.quangduy.product_manager_for_arius.entity.Product;
+import com.quangduy.product_manager_for_arius.entity.Tag;
 import com.quangduy.product_manager_for_arius.repository.CategoryRepository;
+import com.quangduy.product_manager_for_arius.repository.TagRepository;
 import com.quangduy.product_manager_for_arius.service.S3FileUploadService;
+import com.quangduy.product_manager_for_arius.service.TagService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
@@ -33,10 +36,13 @@ public class ProductExcelImport {
     private CategoryRepository categoryRepository;
     @Autowired
     private S3FileUploadService s3FileUploadService;
+    @Autowired
+    private TagRepository tagRepository;
     @NonFinal
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     @NonFinal
-    static String[] HEADERs = { "Name", "Thumbnail", "Sliders", "Price", "Price", "ShortDes", "Category", "Tags" };
+    static String[] HEADERs = { "Name", "Thumbnail", "Sliders", "Price", "ShortDes", "Category", "Tags",
+            "Quantity", "Discount" };
     @NonFinal
     static String SHEET = "Products";
     @NonFinal
@@ -47,6 +53,16 @@ public class ProductExcelImport {
             return false;
         }
         return true;
+    }
+
+    public List<Tag> convertStringToListTag(String t) {
+        String[] temp = t.split(",");
+        List<Tag> tags = new ArrayList<>();
+        for (String i : temp) {
+            Tag tag = this.tagRepository.findByName(i);
+            tags.add(tag);
+        }
+        return tags;
     }
 
     public List<Product> excelToStuList(InputStream is) {
@@ -140,8 +156,15 @@ public class ProductExcelImport {
                             stu.setCategory(entity);
                             break;
                         case 6:
-
-                            stu.setTags(null);
+                            String t = currentCell.getStringCellValue();
+                            List<Tag> tags = this.convertStringToListTag(t);
+                            stu.setTags(tags);
+                            break;
+                        case 7:
+                            stu.setQuantity((long) currentCell.getNumericCellValue());
+                            break;
+                        case 8:
+                            stu.setDiscount(currentCell.getNumericCellValue());
                             break;
                         default:
                             break;

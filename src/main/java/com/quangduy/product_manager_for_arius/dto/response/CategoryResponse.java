@@ -2,6 +2,7 @@ package com.quangduy.product_manager_for_arius.dto.response;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -19,6 +20,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonPropertyOrder(alphabetic = true)
 public class CategoryResponse {
+    @JsonProperty("_id")
+    String id;
     String name;
     Instant createdAt;
     Instant updatedAt;

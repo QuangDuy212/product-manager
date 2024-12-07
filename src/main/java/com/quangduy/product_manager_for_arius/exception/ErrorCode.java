@@ -22,6 +22,7 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(400, "This category not found", HttpStatus.BAD_REQUEST),
     CATEGORY_EXISTED(400, "This category is existed", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(400, "This product not found", HttpStatus.BAD_REQUEST),
+    TAG_NOT_FOUND(400, "This tag not found", HttpStatus.BAD_REQUEST),
     ORDER_NOT_FOUND(400, "This order not found", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED(400, "Role not existed", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_EXISTED(400, "Permission not existed", HttpStatus.BAD_REQUEST),

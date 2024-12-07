@@ -126,6 +126,11 @@ public class ProductService {
         return entity;
     }
 
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = this.productRepository.findAll();
+        return products.stream().map(productMapper::toProductResponse).toList();
+    }
+
     public ApiPagination<ProductResponse> getAllProducts(Specification<Product> spec, Pageable pageable) {
         log.info("Get all products");
         Page<Product> page = this.productRepository.findAll(spec, pageable);
@@ -186,5 +191,13 @@ public class ProductService {
 
     public List<Product> getListProducts(List<String> productIds) {
         return this.productRepository.findByIdIn(productIds);
+    }
+
+    public void save(Product product) {
+        this.productRepository.save(product);
+    }
+
+    public void deleteAll(List<Product> products) {
+        this.productRepository.deleteAll(products);
     }
 }

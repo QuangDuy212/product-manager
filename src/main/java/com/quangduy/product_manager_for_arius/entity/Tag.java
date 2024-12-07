@@ -1,6 +1,7 @@
 package com.quangduy.product_manager_for_arius.entity;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +29,7 @@ public class Tag {
     String description;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
-    Set<Product> products;
+    List<Product> products;
 
     Instant createdAt;
     Instant updatedAt;

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.quangduy.product_manager_for_arius.dto.request.TagRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
 import com.quangduy.product_manager_for_arius.dto.response.TagResponse;
+import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.Tag;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TagService {
     TagRepository tagRepository;
     TagMapper tagMapper;
+    ProductService productService;
 
     public TagResponse create(TagRequest request) {
         log.info("Create a tag");
@@ -71,8 +73,18 @@ public class TagService {
                 .build();
     }
 
-    public void delete(String categoryId) {
+    public void delete(String id) {
         log.info("Delete a tag");
-        this.tagRepository.deleteById(categoryId);
+        Tag tag = this.tagRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND));
+        List<Product> products = tag.getProducts();
+        products.forEach(x -> {
+            x.setTags(null);
+            this.productService.save(x);
+        });
+        this.tagRepository.deleteById(id);
+    }
+
+    public Tag findByName(String name) {
+        return this.tagRepository.findByName(name);
     }
 }
