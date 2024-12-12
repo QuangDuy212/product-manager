@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.quangduy.product_manager_for_arius.dto.request.DeleteAllRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.ProductUpdateRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiPagination;
@@ -65,6 +66,13 @@ public class ProductController {
     ResponseEntity<ApiPagination<ProductResponse>> getAllProducts(@Filter Specification<Product> spec,
             Pageable pageable) {
         return ResponseEntity.ok().body(this.productService.getAllProducts(spec, pageable));
+    }
+
+    @GetMapping("/category/{id}")
+    @ApiMessage("Fetch products by category success")
+    ResponseEntity<ApiPagination<ProductResponse>> fetchByCategory(@PathVariable("id") String id,
+            Pageable pageable) {
+        return ResponseEntity.ok().body(this.productService.fetchProductsByCategory(id, pageable));
     }
 
     @GetMapping("/{id}")
@@ -119,5 +127,15 @@ public class ProductController {
     public ResponseEntity<ApiPagination<ESProductResponse>> searchProductByName(@RequestParam String query,
             Pageable pageable) {
         return ResponseEntity.ok().body(this.esProductService.searchByName(query, pageable));
+    }
+
+    @DeleteMapping("/deleteAll")
+    @ApiMessage("Delete list products success")
+    ResponseEntity<ApiString> deleteListOrder(
+            @RequestBody DeleteAllRequest request) {
+        this.productService.deleteAllById(request.getIds());
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 }

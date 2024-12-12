@@ -19,6 +19,8 @@ import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
 import com.quangduy.product_manager_for_arius.entity.Category;
+import com.quangduy.product_manager_for_arius.entity.Order;
+import com.quangduy.product_manager_for_arius.entity.OrderDetail;
 import com.quangduy.product_manager_for_arius.entity.Product;
 import com.quangduy.product_manager_for_arius.entity.Tag;
 import com.quangduy.product_manager_for_arius.entity.User;
@@ -28,7 +30,9 @@ import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.CategoryMapper;
 import com.quangduy.product_manager_for_arius.mapper.ProductMapper;
 import com.quangduy.product_manager_for_arius.mapper.TagMapper;
+import com.quangduy.product_manager_for_arius.repository.CartDetailRepository;
 import com.quangduy.product_manager_for_arius.repository.CategoryRepository;
+import com.quangduy.product_manager_for_arius.repository.OrderDetailRepository;
 import com.quangduy.product_manager_for_arius.repository.ProductRepository;
 import com.quangduy.product_manager_for_arius.repository.TagRepository;
 import com.quangduy.product_manager_for_arius.repository.es.ESProductRepository;
@@ -46,6 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductService {
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
+    OrderDetailRepository orderDetailRepository;
+    CartDetailRepository cartDetailRepository;
     TagRepository tagRepository;
     ProductMapper productMapper;
     TagMapper tagMapper;
@@ -155,6 +161,10 @@ public class ProductService {
     public void delete(String productId) {
         log.info("Delete a product");
         esProductRepository.deleteById(productId);
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        this.cartDetailRepository.deleteAll(product.getCartDetails());
+        this.orderDetailRepository.deleteAll(product.getOrderDetails());
         this.productRepository.deleteById(productId);
     }
 
@@ -162,6 +172,7 @@ public class ProductService {
         List<Product> entites = new ArrayList<Product>();
         try {
             List<Product> data = productExcelImport.excelToStuList(file.getInputStream());
+            esProductRepository.saveAll(data.stream().map(productMapper::toESProduct).toList());
             entites = productRepository.saveAll(data);
         } catch (IOException ex) {
             throw new RuntimeException("Excel data is failed to store: " + ex.getMessage());
@@ -194,10 +205,49 @@ public class ProductService {
     }
 
     public void save(Product product) {
+        esProductRepository.save(productMapper.toESProduct(product));
         this.productRepository.save(product);
     }
 
     public void deleteAll(List<Product> products) {
+        esProductRepository.deleteAll(products.stream().map(productMapper::toESProduct).toList());
+        products.forEach(i -> {
+            List<OrderDetail> orderDetails = i.getOrderDetails();
+            this.orderDetailRepository.deleteAll(orderDetails);
+        });
         this.productRepository.deleteAll(products);
+    }
+
+    public void deleteAllById(List<String> ids) {
+        List<Product> products = this.productRepository.findByIdIn(ids);
+        esProductRepository.deleteAll(products.stream().map(productMapper::toESProduct).toList());
+        products.forEach(i -> {
+            List<OrderDetail> orderDetails = i.getOrderDetails();
+            this.orderDetailRepository.deleteAll(orderDetails);
+        });
+        this.productRepository.deleteAll(products);
+    }
+
+    public ApiPagination<ProductResponse> fetchProductsByCategory(String id, Pageable pageable) {
+        log.info("Fetch products by category");
+        Category cate = this.categoryRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        Page<Product> page = this.productRepository.findByCategory(cate, pageable);
+
+        List<ProductResponse> list = page.getContent().stream()
+                .map(productMapper::toProductResponse).toList();
+
+        ApiPagination.Meta mt = new ApiPagination.Meta();
+
+        mt.setCurrent(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(page.getTotalPages());
+        mt.setTotal(page.getTotalElements());
+
+        return ApiPagination.<ProductResponse>builder()
+                .meta(mt)
+                .result(list)
+                .build();
     }
 }

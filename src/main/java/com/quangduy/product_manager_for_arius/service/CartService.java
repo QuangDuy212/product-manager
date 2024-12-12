@@ -79,9 +79,9 @@ public class CartService {
             } else
                 old.add(cartDetail);
             cart.setCartDetails(old);
-        } else {
             int sum = cart.getSum() + 1;
             cart.setSum(sum);
+        } else {
             long quantity = cartDetail.getQuantity() + request.getQuantity();
             cartDetail.setQuantity(quantity);
         }
@@ -95,14 +95,17 @@ public class CartService {
         CartDetail cartDetail = this.cartDetailService.fetchById(id);
         Cart cart = cartDetail.getCart();
         String cartId = cart.getId();
-        this.cartDetailService.deleteCartDetailById(id);
         if (cart.getSum() > 1) {
             int sum = cart.getSum() - 1;
             cart.setSum(sum);
             this.cartRepository.save(cart);
+            this.cartDetailService.deleteCartDetailById(id);
         } else {
-            this.cartRepository.deleteById(cartId);
+            cart.setSum(0);
+            this.cartRepository.save(cart);
+            this.cartDetailService.deleteCartDetailById(id);
         }
-        return this.cartMapper.toCartResponse(cart);
+        var res = this.cartMapper.toCartResponse(cart);
+        return res;
     }
 }

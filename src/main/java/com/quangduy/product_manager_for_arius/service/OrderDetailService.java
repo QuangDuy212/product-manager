@@ -90,4 +90,14 @@ public class OrderDetailService {
         log.info("Delete a order detail");
         this.orderDetailRepository.deleteById(id);
     }
+
+    public void deleteAll(List<OrderDetail> orderDetails) {
+        log.info("Delete all orderDetail");
+        this.orderDetailRepository.deleteAll(orderDetails);
+    }
+
+    public void deleteAllById(List<String> ids) {
+        log.info("Delete all orderDetail");
+        this.orderDetailRepository.deleteAllByIdInBatch(ids);
+    }
 }

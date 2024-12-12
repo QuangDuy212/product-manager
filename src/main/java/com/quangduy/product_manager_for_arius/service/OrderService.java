@@ -15,6 +15,8 @@ import com.quangduy.product_manager_for_arius.dto.response.OrderDetailResponse;
 import com.quangduy.product_manager_for_arius.dto.response.OrderResponse;
 import com.quangduy.product_manager_for_arius.dto.response.ProductResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.entity.Cart;
+import com.quangduy.product_manager_for_arius.entity.CartDetail;
 import com.quangduy.product_manager_for_arius.entity.Order;
 import com.quangduy.product_manager_for_arius.entity.OrderDetail;
 import com.quangduy.product_manager_for_arius.entity.Product;
@@ -24,6 +26,8 @@ import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.OrderDetailMapper;
 import com.quangduy.product_manager_for_arius.mapper.OrderMapper;
 import com.quangduy.product_manager_for_arius.mapper.ProductMapper;
+import com.quangduy.product_manager_for_arius.repository.CartDetailRepository;
+import com.quangduy.product_manager_for_arius.repository.CartRepository;
 import com.quangduy.product_manager_for_arius.repository.OrderDetailRepository;
 import com.quangduy.product_manager_for_arius.repository.OrderRepository;
 import com.quangduy.product_manager_for_arius.repository.ProductRepository;
@@ -48,6 +52,8 @@ public class OrderService {
         UserRepository userRepository;
         OrderDetailRepository orderDetailRepository;
         ProductRepository productRepository;
+        CartRepository cartRepository;
+        CartDetailRepository cartDetailRepository;
 
         public OrderResponse create(OrderCreationRequest request) {
                 log.info("Create a order");
@@ -56,6 +62,10 @@ public class OrderService {
                         User user = this.userRepository.findById(request.getUserId())
                                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
                         order.setUser(user);
+                        Cart cart = this.cartRepository.findByUser(user);
+                        List<CartDetail> cartDetails = cart.getCartDetails();
+                        this.cartDetailRepository.deleteAll(cartDetails);
+                        this.cartRepository.delete(cart);
                 }
                 Order entity = this.orderRepository.save(order);
                 List<OrderDetail> listOrderDetails = request.getDetail().stream()
@@ -63,6 +73,9 @@ public class OrderService {
                                         Product product = this.productRepository.findById(i.getId())
                                                         .orElseThrow(() -> new AppException(
                                                                         ErrorCode.PRODUCT_NOT_FOUND));
+                                        long newQ = product.getQuantity() - i.getQuantity();
+                                        product.setQuantity(newQ);
+                                        productRepository.save(product);
                                         OrderDetail orderDetail = OrderDetail.builder()
                                                         .quantity(i.getQuantity())
                                                         .price(product.getPrice())
@@ -75,6 +88,7 @@ public class OrderService {
                                 .map(orderDetailMapper::toOrderDetailResponse).toList();
                 OrderResponse res = this.orderMapper.toOrderResponse(entity);
                 res.setOrderDetails(orderDetails);
+
                 return res;
         }
 
@@ -162,6 +176,15 @@ public class OrderService {
                 List<OrderDetail> a = order.getOrderDetails();
                 this.orderDetailRepository.deleteAll(a);
                 this.orderRepository.deleteById(id);
+        }
+
+        public void deleteAll(List<String> ids) {
+                log.info("Delete list orders");
+                List<Order> orders = this.orderRepository.findByIdIn(ids);
+                orders.forEach(i -> {
+                        this.orderDetailRepository.deleteAll(i.getOrderDetails());
+                });
+                this.orderRepository.deleteAll(orders);
         }
 
 }

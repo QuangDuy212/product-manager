@@ -32,7 +32,7 @@ public class Cart {
     @JoinColumn(name = "user_id")
     User user;
 
-    @OneToMany(mappedBy = "cart")
+    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
     List<CartDetail> cartDetails;
 
     Instant createdAt;

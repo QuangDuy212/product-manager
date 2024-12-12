@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.quangduy.product_manager_for_arius.dto.request.DeleteAllRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderRequest;
 import com.quangduy.product_manager_for_arius.dto.request.OrderUpdateRequest;
@@ -89,7 +90,16 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiString.builder()
                 .message("success")
                 .build());
+    }
 
+    @DeleteMapping("/deleteAll")
+    @ApiMessage("Delete list orders success")
+    ResponseEntity<ApiString> deleteListOrder(
+            @RequestBody DeleteAllRequest request) {
+        this.orderService.deleteAll(request.getIds());
+        return ResponseEntity.ok().body(ApiString.builder()
+                .message("success")
+                .build());
     }
 
     @GetMapping("/export/excel")

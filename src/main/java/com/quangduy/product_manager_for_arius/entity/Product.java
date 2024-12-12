@@ -46,6 +46,9 @@ public class Product {
     @JsonIgnore
     List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "product")
+    @JsonIgnore
+    List<CartDetail> cartDetails;
     Instant createdAt;
     Instant updatedAt;
     String createdBy;
