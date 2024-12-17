@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TagRequest {
-    @Size(min = 3, message = "INVALID_PASSWORD")
+    @Size(min = 3, message = "INVALID_TAG_NAME")
     String name;
     String description;
 }

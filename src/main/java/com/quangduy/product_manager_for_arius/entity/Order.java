@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.quangduy.product_manager_for_arius.util.SecurityUtil;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +29,6 @@ public class Order {
     double totalPrice;
     String reciverName;
     String reciverAddress;
-    @Pattern(regexp = "(^$|[0-9]{10})")
     String reciverPhone;
     String status;
 

@@ -21,7 +21,6 @@ public class OrderRequest {
     double totalPrice;
     String reciverName;
     String reciverAddress;
-    @Pattern(regexp = "(^$|[0-9]{10})")
     String reciverPhone;
     String status;
     String userId;
