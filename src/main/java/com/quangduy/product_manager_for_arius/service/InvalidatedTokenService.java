@@ -1,5 +1,6 @@
 package com.quangduy.product_manager_for_arius.service;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.quangduy.product_manager_for_arius.repository.InvalidatedTokenRepository;
@@ -18,5 +19,10 @@ public class InvalidatedTokenService {
 
     public boolean checkToken(String token) {
         return this.invalidatedTokenRepository.existsByAccessToken(token);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void clearToken() {
+        this.invalidatedTokenRepository.deleteAll();
     }
 }
