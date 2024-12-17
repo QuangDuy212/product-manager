@@ -12,19 +12,38 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.quangduy.product_manager_for_arius.dto.request.IntrospectRequest;
 import com.quangduy.product_manager_for_arius.dto.response.AuthenticationResponse;
+import com.quangduy.product_manager_for_arius.dto.response.IntrospectResponse;
 import com.quangduy.product_manager_for_arius.dto.response.UserInToken;
 import com.quangduy.product_manager_for_arius.dto.response.UserResponse;
+import com.quangduy.product_manager_for_arius.exception.AppException;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +52,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityUtil {
     @NonFinal
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
@@ -40,6 +60,10 @@ public class SecurityUtil {
     @Value("${quangduy.jwt.base64-secret-access}")
     @NonFinal
     private String jwtKey;
+
+    @Value("${quangduy.jwt.base64-secret-fresh}")
+    @NonFinal
+    private String jwtKeyRefresh;
 
     @Value("${quangduy.jwt.access-token-validity-in-seconds}")
     @NonFinal
@@ -49,9 +73,11 @@ public class SecurityUtil {
     @NonFinal
     private long refreshTokenExpiration;
 
-    final JwtEncoder jwtEncoder;
+    final JwtEncoder accessTokenEncoder;
+    final JwtEncoder refreshTokenEncoder;
 
-    public String createAccessToken(String username, UserResponse dto) {
+    public String createAccessToken(String username, UserResponse dto) throws JOSEException {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         // user info inside token
         UserInToken user = UserInToken.builder()
                 .id(dto.getId())
@@ -60,55 +86,71 @@ public class SecurityUtil {
                 .build();
         // time
         Instant now = Instant.now();
-        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
+        Instant validity = now.plus(accessTokenExpiration, ChronoUnit.SECONDS);
 
         // hardcode permission (for testing)
         List<String> listAuthority = new ArrayList<String>();
         listAuthority.add("ROLE_USER_CREATE");
         listAuthority.add("ROLE_USER_UPDATE");
-
         // @formatter:off
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuedAt(now)
-                .expiresAt(validity)
-                .subject(username)
-                .claim("user", user)
-                .claim("permission", listAuthority)
-                .build();
-        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        String a = this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-        return a;
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+        .subject(username)
+        .claim("user", user)
+        .claim("permission", listAuthority)
+        .issueTime(Date.from(now))
+        .expirationTime(Date.from(validity))
+        .build();
+        SignedJWT signedJWT = new SignedJWT(header, claims);
+                // Sign the JWT with the secret key
+                MACSigner signer = new MACSigner(java.util.Base64.getDecoder().decode(jwtKey));
+                signedJWT.sign(signer);
+        
+                return signedJWT.serialize();
     }
 
-    public String createRefreshToken(String username, AuthenticationResponse dto) {
-        // user info inside token
+    
+
+    public String createRefreshToken(String username, AuthenticationResponse dto) throws JOSEException {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         UserInToken user = UserInToken.builder()
-                .id(dto.getUser().getId())
-                .username(username)
-                .role(dto.getUser().getRole().getName())
-                .build();
-        // time
-        Instant now = Instant.now();
-        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+            .id(dto.getUser().getId())
+            .username(username)
+            .role(dto.getUser().getRole().getName())
+            .build();
 
-        // @formatter:off
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuedAt(now)
-                .expiresAt(validity)
-                .subject(username)
-                .claim("user", user)
-                .build();
-        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+        Instant now = Instant.now();
+        Instant validity = now.plus(refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+            .subject(username)
+            .claim("user", user)
+            .claim("token_type", "refresh")
+            .issueTime(Date.from(now))
+            .expirationTime(Date.from(validity))
+            .build();
+
+        SignedJWT signedJWT = new SignedJWT(header, claims);
+
+        // Sign the JWT with the secret key
+        MACSigner signer = new MACSigner(java.util.Base64.getDecoder().decode(jwtKeyRefresh));
+        signedJWT.sign(signer);
+
+        return signedJWT.serialize();
     }
+
 
     private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
         return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
     }
 
+    private SecretKey getSecretKeyRefresh() {
+        byte[] keyBytes = Base64.from(jwtKeyRefresh).decode();
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
+    }
+
     public Jwt checkValidRefreshToken(String token){
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(getSecretKey())
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(getSecretKeyRefresh())
                 .macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
                 try {
                      return jwtDecoder.decode(token);
@@ -116,6 +158,19 @@ public class SecurityUtil {
                     System.out.println(">>> Refresh token error: " + e.getMessage());
                     throw e;
                 }
+    }
+
+    public String getUsernameFromRefreshToken(String refreshToken) {
+        return (String) Jwts.parser()
+                .verifyWith(getRefreshKey())
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload()
+                .get("username");
+    }
+
+       private SecretKey getRefreshKey() {
+        return Keys.hmacShaKeyFor(jwtKeyRefresh.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -152,4 +207,15 @@ public class SecurityUtil {
             .filter(authentication -> authentication.getCredentials() instanceof String)
             .map(authentication -> (String) authentication.getCredentials());
     }
+
+    // public IntrospectResponse introspect(String token) throws JOSEException, ParseException {
+    //     boolean isValid = true;
+    //     try {
+    //         verifyToken(token, false);
+    //     } catch (AppException e) {
+    //         isValid = false;
+    //     }
+
+    //     return IntrospectResponse.builder().valid(isValid).build();
+    // }
 }

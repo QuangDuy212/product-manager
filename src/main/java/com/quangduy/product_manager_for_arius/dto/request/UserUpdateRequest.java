@@ -18,5 +18,4 @@ public class UserUpdateRequest {
     String username;
     String address;
     String role;
-    boolean active;
 }

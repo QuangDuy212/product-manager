@@ -91,6 +91,30 @@ public class CartService {
         return this.cartMapper.toCartResponse(cart);
     }
 
+    public CartResponse handleChangeQuantityInCart(CartRequest request) {
+        if (SecurityUtil.getCurrentUserLogin().isPresent() == false) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        String username = SecurityUtil.getCurrentUserLogin().get();
+        User user = this.userService.handleGetUserByUsername(username);
+        Cart cart = this.cartRepository.findByUser(user);
+        if (cart == null) {
+            cart = this.cartRepository.save(Cart.builder()
+                    .user(user)
+                    .sum(0)
+                    .build());
+        }
+        Product product = this.productService.getProductById(request.getProductId());
+        CartDetail cartDetail = this.cartDetailService.fetchByCartAndProduct(cart, product);
+
+        long quantity = request.getQuantity();
+        cartDetail.setQuantity(quantity);
+        this.cartDetailService.save(cartDetail);
+        this.cartRepository.save(cart);
+
+        return this.cartMapper.toCartResponse(cart);
+    }
+
     public CartResponse handleRemoveCartDetail(String id) {
         CartDetail cartDetail = this.cartDetailService.fetchById(id);
         Cart cart = cartDetail.getCart();

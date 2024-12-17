@@ -40,7 +40,7 @@ spring:
 quangduy:
   jwt:
     base64-secret-access: qoAEABDke07+AVLepXB4aCMtsT0wMAqR5x2VFyldsnx6e75YQkJH2UcZKTjEyoNgG71SBCXfq5N6NVZxWOfsHQ==
-    base64-secret-fresh: cmVmZXJ3aXJldHJpY2thY3R1YWxvcmdhbml6YXRpb25lc2NhcGVkZXNrc3RvcHBlZGU=
+    base64-secret-fresh: Io0JORP+HAY9pQBkr/YRK1FA1CpJpz3tGjNrAO6Edjgod+QbUSjrcu6aeFH3vH+KM1So3rjTdAm66fXQGWNL4A==
     access-token-validity-in-seconds: 8640000
     refresh-token-validity-in-seconds: 8640000
 aws:

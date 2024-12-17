@@ -58,34 +58,47 @@ public class OrderService {
         public OrderResponse create(OrderCreationRequest request) {
                 log.info("Create a order");
                 Order order = this.orderMapper.toOrder(request);
-                if (request.getUserId() != null) {
-                        User user = this.userRepository.findById(request.getUserId())
-                                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-                        order.setUser(user);
-                        Cart cart = this.cartRepository.findByUser(user);
-                        List<CartDetail> cartDetails = cart.getCartDetails();
-                        this.cartDetailRepository.deleteAll(cartDetails);
-                        this.cartRepository.delete(cart);
-                }
+                List<String> ids = request.getDetail().stream().map(i -> i.getId()).toList();
+                List<CartDetail> cd = this.cartDetailRepository.findByIdIn(ids);
+
+                User user = this.userRepository.findById(request.getUserId())
+                                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                order.setUser(user);
+                Cart cart = this.cartRepository.findByUser(user);
+                int newSum = cart.getSum() - request.getDetail().size();
+                cart.setSum(newSum);
+                this.cartRepository.save(cart);
+                // List<CartDetail> newCD = cart.getCartDetails().stream()
+                // .filter(i -> !cd.contains(i))
+                // .toList();
+                // cart.setCartDetails(newCD);
+                cd.forEach(i -> {
+                        i.setCart(null);
+                        this.cartDetailRepository.save(i);
+                });
                 Order entity = this.orderRepository.save(order);
                 List<OrderDetail> listOrderDetails = request.getDetail().stream()
                                 .map(i -> {
-                                        Product product = this.productRepository.findById(i.getId())
+                                        CartDetail cdLocal = this.cartDetailRepository.findById(i.getId())
                                                         .orElseThrow(() -> new AppException(
-                                                                        ErrorCode.PRODUCT_NOT_FOUND));
-                                        long newQ = product.getQuantity() - i.getQuantity();
+                                                                        ErrorCode.CARTDETAIL_NOT_EXISTED));
+                                        Product product = cdLocal.getProduct();
+                                        long newQ = product.getQuantity() - cdLocal.getQuantity();
                                         product.setQuantity(newQ);
                                         productRepository.save(product);
                                         OrderDetail orderDetail = OrderDetail.builder()
-                                                        .quantity(i.getQuantity())
+                                                        .quantity(cdLocal.getQuantity())
                                                         .price(product.getPrice())
                                                         .order(entity)
                                                         .product(product)
                                                         .build();
                                         return this.orderDetailRepository.save(orderDetail);
                                 }).toList();
+                this.cartDetailRepository.deleteAll(cd);
+
                 List<OrderDetailResponse> orderDetails = listOrderDetails.stream()
                                 .map(orderDetailMapper::toOrderDetailResponse).toList();
+
                 OrderResponse res = this.orderMapper.toOrderResponse(entity);
                 res.setOrderDetails(orderDetails);
 

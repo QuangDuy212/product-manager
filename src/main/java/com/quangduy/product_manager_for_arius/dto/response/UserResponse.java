@@ -26,7 +26,6 @@ public class UserResponse {
     String username;
     String name;
     String address;
-    boolean active;
     Role role;
     Instant createdAt;
     Instant updatedAt;

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.quangduy.product_manager_for_arius.validator.DobConstraint;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class UserCreationRequest {
     @Size(min = 6, message = "INVALID_PASSWORD")
     String password;
 
+    @NotBlank
     String name;
     String address;
 

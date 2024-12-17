@@ -41,6 +41,12 @@ public class CartController {
         return ResponseEntity.ok().body(this.cartService.handleAddProductToCart(request));
     }
 
+    @PostMapping("/change")
+    @ApiMessage("Change quantity product in cart success")
+    ResponseEntity<CartResponse> changeQuantityInCart(@RequestBody @Valid CartRequest request) {
+        return ResponseEntity.ok().body(this.cartService.handleChangeQuantityInCart(request));
+    }
+
     @PostMapping("/delete/{id}")
     @ApiMessage("Delete cart detail from cart success")
     ResponseEntity<CartResponse> deleteProductFromCart(@PathVariable("id") String id) {

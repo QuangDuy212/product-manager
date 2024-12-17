@@ -37,6 +37,5 @@ public class OrderCreationRequest {
     public static class DetailRequest {
         @JsonProperty("_id")
         String id;
-        long quantity;
     }
 }

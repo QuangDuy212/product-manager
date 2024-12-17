@@ -25,6 +25,10 @@ import com.quangduy.product_manager_for_arius.entity.User;
 import com.quangduy.product_manager_for_arius.exception.AppException;
 import com.quangduy.product_manager_for_arius.exception.ErrorCode;
 import com.quangduy.product_manager_for_arius.mapper.UserMapper;
+import com.quangduy.product_manager_for_arius.repository.CartDetailRepository;
+import com.quangduy.product_manager_for_arius.repository.CartRepository;
+import com.quangduy.product_manager_for_arius.repository.OrderDetailRepository;
+import com.quangduy.product_manager_for_arius.repository.OrderRepository;
 import com.quangduy.product_manager_for_arius.repository.RoleRepository;
 import com.quangduy.product_manager_for_arius.repository.UserRepository;
 import com.quangduy.product_manager_for_arius.service.importfile.UserExcelImport;
@@ -40,6 +44,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    CartRepository cartRepository;
+    OrderRepository orderRepository;
+    OrderDetailRepository orderDetailRepository;
+    CartDetailRepository cartDetailRepository;
     RoleService roleService;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
@@ -49,7 +57,6 @@ public class UserService {
         log.info("Create a user");
         User user = this.userMapper.toUser(request);
         user.setPassword(this.passwordEncoder.encode(request.getPassword()));
-        user.setActive(true);
         if (request.getRole() == null) {
             request.setRole(PredefinedRole.USER_ROLE);
             Role role = this.roleService.findByName(PredefinedRole.USER_ROLE);
@@ -95,9 +102,6 @@ public class UserService {
             }
             user.setUsername(request.getUsername());
         }
-        if (request.isActive()) {
-            user.setActive(true);
-        }
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -105,8 +109,21 @@ public class UserService {
         log.info("Delete a user");
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        user.setActive(false);
-        this.userRepository.save(user);
+        if (user.getCart() != null) {
+            if (user.getCart().getCartDetails() != null) {
+                this.cartDetailRepository.deleteAll(user.getCart().getCartDetails());
+            }
+            this.cartRepository.delete(user.getCart());
+        }
+        if (user.getOrders() != null) {
+            user.getOrders().forEach(i -> {
+                if (i.getOrderDetails() != null) {
+                    this.orderDetailRepository.deleteAll(i.getOrderDetails());
+                }
+            });
+            this.orderRepository.deleteAll(user.getOrders());
+        }
+        this.userRepository.delete(user);
     }
 
     public ApiPagination<UserResponse> getAllUsers(Specification<User> spec, Pageable pageable) {

@@ -89,59 +89,11 @@ public class ProductExcelImport {
                             stu.setName(currentCell.getStringCellValue());
                             break;
                         case 1:
-                            Drawing<?> drawing = currentRow.getSheet().createDrawingPatriarch();
-                            List<? extends PictureData> pictures = workbook.getAllPictures();
-                            String imagePath = null;
-
-                            for (PictureData pictureData : pictures) {
-                                if (pictureData instanceof XSSFPictureData) {
-                                    // Extract picture details
-                                    XSSFPictureData xssfPictureData = (XSSFPictureData) pictureData;
-
-                                    // Save or return the image bytes
-                                    byte[] imageBytes = xssfPictureData.getData();
-                                    String extension = xssfPictureData.suggestFileExtension();
-                                    String fileName = "product_" + UUID.randomUUID().toString();
-                                    File tempFile = File.createTempFile(fileName,
-                                            "." + extension,
-                                            new File(DIRECTORY));
-                                    Files.write(tempFile.toPath(), imageBytes);
-                                    String imageUrl = this.s3FileUploadService.uploadFile(tempFile,
-                                            "quangduy/thumbnail", fileName);
-
-                                    // Set the path as a property for the Product
-                                    imagePath = imageUrl;
-                                }
-                            }
-
-                            stu.setThumbnail(imagePath);
+                            stu.setThumbnail(currentCell.getStringCellValue());
                             break;
                         case 2:
-                            Drawing<?> drawing1 = currentRow.getSheet().createDrawingPatriarch();
-                            List<? extends PictureData> pictures1 = workbook.getAllPictures();
-                            String imagePath1 = null;
-
-                            for (PictureData pictureData : pictures1) {
-                                if (pictureData instanceof XSSFPictureData) {
-                                    XSSFPictureData xssfPictureData = (XSSFPictureData) pictureData;
-
-                                    // Save or return the image bytes
-                                    byte[] imageBytes = xssfPictureData.getData();
-                                    String extension = xssfPictureData.suggestFileExtension();
-                                    String fileName = "product_" + UUID.randomUUID().toString();
-                                    File tempFile = File.createTempFile(fileName,
-                                            "." + extension,
-                                            new File(DIRECTORY));
-                                    Files.write(tempFile.toPath(), imageBytes);
-                                    String imageUrl = this.s3FileUploadService.uploadFile(tempFile,
-                                            "quangduy/sliders", fileName);
-
-                                    // Set the path as a property for the Product
-                                    imagePath1 = imageUrl;
-                                }
-                            }
                             List<String> sliders = new ArrayList<String>();
-                            sliders.add(imagePath1);
+                            sliders.add(currentCell.getStringCellValue());
                             stu.setSliders(sliders);
                             break;
                         case 3:

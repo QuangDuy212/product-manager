@@ -1,13 +1,17 @@
 package com.quangduy.product_manager_for_arius.controller;
 
+import java.text.ParseException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nimbusds.jose.JOSEException;
 import com.quangduy.product_manager_for_arius.dto.request.AuthenticationRequest;
 import com.quangduy.product_manager_for_arius.dto.request.UserCreationRequest;
 import com.quangduy.product_manager_for_arius.dto.response.ApiResponse;
@@ -33,7 +37,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @ApiMessage("Login success")
-    ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+    ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) throws Exception {
         return authenticationService.login(request);
     }
 
@@ -51,14 +55,16 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     @ApiMessage("Logout success")
-    ResponseEntity<Void> logout() {
-        return this.authenticationService.logout();
+    ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorizationHeader)
+            throws AppException, ParseException, JOSEException {
+        return this.authenticationService.logout(authorizationHeader);
     }
 
     @PostMapping("/refresh")
     @ApiMessage("Logout success")
     ResponseEntity<AuthenticationResponse> refreshToken(
-            @CookieValue(name = "refresh_token", defaultValue = "duy") String refresh_token) {
+            @CookieValue(name = "refresh_token", defaultValue = "duy") String refresh_token)
+            throws AppException, JOSEException, ParseException {
         return this.authenticationService.refreshToken(refresh_token);
     }
 }
